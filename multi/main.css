@@ -68,6 +68,7 @@ button.icon {
   filter: invert(100%);
   border: 0;
   margin-right: 10px;
+  image-rendering: pixelated;
 }
 
 input {
@@ -106,8 +107,12 @@ button:hover {
   filter: invert(0%);
 }
 
-.upload { background: url(/icon/upload.svg); }
-.download_file { background: url(/icon/download.svg); }
+.upload { 
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAGFJREFUOE+1ksESABAIBfX/H80wMkmpKZwc3m5UUJIHJl+DHqACvHtdvehbgbcyza0XRODBWP/G5qq5m4BPRsxqAm2sR14SWDuxMVxgwdjsxVGBF94k35rYq6Sm8ETg2s4G/iAPEUmUCWwAAAAASUVORK5CYII=);
+ }
+.download_file { 
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAFRJREFUOE9jZKAQMOLR/x9NDqvaYWYAup8JBS/Y++hhQKwhcH3YApGQISh6cMUCLkMw1NM0GkFhBHMJTovwuYBQLIDlYQYQCjhchjEOHgOI8i82RQAMrA0Ra9ZmhQAAAABJRU5ErkJggg==);
+ }
 
 
 /* .canvas_output {

@@ -266,6 +266,12 @@ function init() {
       elements.cursor.childNodes[0].innerHTML = ''
     })
   })
+
+  window.addEventListener('keydown', e=> {
+    if (e.key === 'e') {
+      console.log(artData)
+    }
+  })
 }
 
 window.addEventListener('DOMContentLoaded', init)

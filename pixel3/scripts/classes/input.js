@@ -9,7 +9,9 @@ class Input {
       el: Object.assign(document.createElement('div'), {
         className: isColorInput ? 'color-input-wrap' : 'input-wrap',
         innerHTML: `
-          <label class="${isColorInput ? 'color-label' : ''}" for="${props.inputName}">
+          <label class="${isColorInput ? 'color-label' : ''}" for="${
+          props.inputName
+        }">
             ${isColorInput ? '' : label}
           </label>
           <input 
@@ -18,7 +20,7 @@ class Input {
             type="${isColorInput ? 'color' : 'text'}" 
             placeholder="${label}"
           >
-        `
+        `,
       }),
       ...props,
     })
@@ -45,15 +47,25 @@ class Input {
     settings[this.inputName] = v
   }
   updateColor() {
-    const label = this.label || settings.inputs[this.inputName.replace('hex', 'color')].label
+    const label =
+      this.label ||
+      settings.inputs[this.inputName.replace('hex', 'color')].label
     label.style.backgroundColor = settings[this.key]
-    if (settings?.inputs[this.key]) settings.inputs[this.key].value = settings[this.key]
+    if (settings?.inputs[this.key])
+      settings.inputs[this.key].value = settings[this.key]
+  }
+  updateColorInputs(color) {
+    settings.color = color
+    settings.inputs.hex.value = color
+    settings.inputs.color.value = color
+    settings.inputs.color.label.style.backgroundColor = color
   }
   addChangeListener() {
     this.input.addEventListener('change', e => {
       settings[this.key] = e.target.value
-      if (['color', 'color2', 'hex', 'hex2'].includes(this.inputName)) this.updateColor()
-      if (this.update) this.update() 
+      if (['color', 'color2', 'hex', 'hex2'].includes(this.inputName))
+        this.updateColor()
+      if (this.update) this.update()
     })
   }
 }
@@ -63,20 +75,21 @@ class SizeInput extends Input {
     this.input.addEventListener('change', e => {
       this.resizeColors()
       settings[this.key] = +e.target.value
-      if (this.update) this.update() 
+      if (this.update) this.update()
     })
   }
   resizeColors = () => {
     const newArr = settings.splitColors
     newArr.length = settings.inputs.row.value
-    // newArr.fill(new Array(newArr.length).fill('transparent'), row) 
-    settings.inputs.colors.value = newArr.map(arr => {
-      const arrCopy = arr
-      arrCopy.length = settings.inputs.column.value
-      arrCopy.fill('transparent', settings.column)
-      return arrCopy
-    }).flat(1)
-    settings.colors =  settings.inputs.colors.value
+    settings.inputs.colors.value = newArr
+      .map(arr => {
+        const arrCopy = arr
+        arrCopy.length = settings.inputs.column.value
+        arrCopy.fill('transparent', settings.column)
+        return arrCopy
+      })
+      .flat(1)
+    settings.colors = settings.inputs.colors.value
   }
 }
 
@@ -84,10 +97,12 @@ class TextArea {
   constructor(props) {
     Object.assign(this, {
       el: Object.assign(document.createElement('div'), {
-        innerHTML: `<textarea className="${props.className || ''}" spellcheck="false" />`
+        innerHTML: `<textarea className="${
+          props.className || ''
+        }" spellcheck="false" />`,
       }),
       inputName: props.inputName || props.className,
-      ...props
+      ...props,
     })
     this.container.append(this.el)
     this.input = this.el.querySelector('textarea')
@@ -100,7 +115,7 @@ class TextArea {
       new Button({
         ...b,
         container: buttonWrapper,
-        action: () => b.action(this)
+        action: () => b.action(this),
       })
     })
     settings.inputs[this.inputName] = this
@@ -131,17 +146,22 @@ class Upload {
           <input id="upload" type="file" single/>
           <label for="upload" class="upload icon"></label>
           <div></div>
-        `
+        `,
       }),
-      ...props
+      ...props,
     })
     this.container.appendChild(this.el)
-      ;['input', 'label', 'display'].forEach(key => this[key] = this.el.querySelector(`${key === 'display' ? 'div' : key}`))
+    ;['input', 'label', 'display'].forEach(
+      key =>
+        (this[key] = this.el.querySelector(
+          `${key === 'display' ? 'div' : key}`
+        ))
+    )
 
     this.pixeliseBtn = new Button({
       container: this.container,
       className: 'pixelise icon d-none',
-      action: () => elements.artboard.outputFromImage()
+      action: () => elements.artboard.outputFromImage(),
     })
     this.el.addEventListener('change', () => {
       elements.artboard.uploadedFile = this.input.files[0]
@@ -161,15 +181,8 @@ class Button {
       ...props,
     })
     props.container.appendChild(this.el)
-    this.el.addEventListener('click', ()=> this.action(this))
+    this.el.addEventListener('click', () => this.action(this))
   }
 }
 
-
-export {
-  Input,
-  SizeInput,
-  TextArea,
-  Button,
-  Upload
-}
+export { Input, SizeInput, TextArea, Button, Upload }
