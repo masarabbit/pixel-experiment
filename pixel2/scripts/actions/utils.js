@@ -47,10 +47,18 @@ const sortByFreqRemoveBlankAndDuplicates = arr =>{
   return [...new Set(orderedByFrequency.map(ele => ele[0]))]
 }
 
-const copyText = box =>{
-  box.select()
-  box.setSelectionRange(0, 999999) // For mobile devices 
-  document.execCommand('copy')
+// const copyText = box =>{
+//   box.select()
+//   box.setSelectionRange(0, 999999) // For mobile devices 
+//   document.execCommand('copy')
+// }
+
+const copyText = async (box) => {
+  try {
+    await navigator.clipboard.writeText(box.value)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
 }
 
 export {

@@ -112,10 +112,13 @@ class TextArea {
     this.input.value = val
     settings[this.inputName] = Array.isArray(val) ? val : val.split(',')
   }
-  copyText() {
-    this.input.select()
-    this.input.setSelectionRange(0, 999999) // For mobile devices 
-    document.execCommand('copy')
+  async copyText() {
+    try {
+      this.input.select()
+      await navigator.clipboard.writeText(this.input.value)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
   }
 }
 
