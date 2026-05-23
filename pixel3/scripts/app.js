@@ -1,4 +1,4 @@
-import { Input, SizeInput, TextArea, Upload, Button } from './classes/input.js'
+import { Input, SizeInput, TextArea, Upload } from './classes/input.js'
 import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { settings, elements } from './elements.js'
@@ -13,8 +13,8 @@ import { mouse } from './utils.js'
 
 // TODO palettes / presets
 
-function init() {
-  elements.windows = {
+window.addEventListener('DOMContentLoaded', ()=> {
+   elements.windows = {
     colors: new NavWindow({
       name: 'colors',
       container: elements.body,
@@ -186,10 +186,12 @@ function init() {
         nav.addButtons([
           {
             className: 'select-state',
+            shortCut: 's',
             action: () => elements.artboard.toggleSelectState(),
           },
           {
             className: 'copy-selection',
+            shortCut: 'c',
             action: () => {
               if (elements.artboard.selectBox)
                 elements.artboard.selectBox.copy()
@@ -197,6 +199,7 @@ function init() {
           },
           {
             className: 'paste-selection',
+            shortCut: 'v',
             action: () => {
               const { selectBox } = elements.artboard
               if (selectBox && selectBox.copyData.length) selectBox.paste()
@@ -204,12 +207,14 @@ function init() {
           },
           {
             className: 'cut-selection',
+            shortCut: 'x',
             action: () => {
               if (elements.artboard.selectBox) elements.artboard.selectBox.cut()
             },
           },
           {
             className: 'crop-selection',
+            shortCut: 'k',
             action: () => {
               if (elements.artboard.selectBox)
                 elements.artboard.selectBox.crop()
@@ -246,6 +251,7 @@ function init() {
           },
           {
             className: 'fill',
+            shortCut: 'f',
             action: b => {
               b.el.classList.toggle('active')
               settings.fill = !settings.fill
@@ -253,6 +259,7 @@ function init() {
           },
           {
             className: 'clear',
+            shortCut: 'e',
             action: b => {
               b.el.classList.toggle('active')
               settings.erase = !settings.erase
@@ -285,6 +292,7 @@ function init() {
           },
           {
             className: 'color-picker',
+            shortCut: 'p',
             action: b => {
               b.el.classList.toggle('active')
               settings.colorPick = !settings.colorPick
@@ -323,10 +331,22 @@ function init() {
         ]),
     }),
   }
+  
+  document.querySelectorAll('button').forEach(b => {
+    // TODO ref can be used to create a list of shortCut
+    if (b.dataset.shortCut) settings.shortCuts[b.dataset.shortCut] = { button: b, ref: b.classList[1] }
+  })
+
+  window.addEventListener('keyup', e => {
+    const b = settings.shortCuts[e.key.toLowerCase()]
+    if (b) b.button.click()
+  })
+
 
   elements.readData()
   settings.recordState()
   mouse.up(document, 'add', () => settings.recordState())
-}
+})
 
-window.addEventListener('DOMContentLoaded', init)
+
+

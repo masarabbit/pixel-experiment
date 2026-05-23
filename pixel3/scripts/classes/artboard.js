@@ -215,12 +215,13 @@ class Artboard extends PageObject {
     this.overlay.el.classList.add('freeze')
   }
   toggleSelectState() {
-    if (this.selectBox) {
-      this.overlay.el.classList.remove('freeze')
-      this.selectBox.el.remove()
-      this.selectBox = null
-      this.overlay.el.classList.remove('select')
+    if (this.overlay.el.classList.contains('select')) {
+      this.overlay.el.className = 'overlay'
       this.el.classList.remove('freeze')
+      if (this.selectBox) {
+        this.selectBox.el.remove()
+        this.selectBox = null
+      }
     } else {
       this.overlay.el.classList.add('select')
       this.el.classList.add('freeze')

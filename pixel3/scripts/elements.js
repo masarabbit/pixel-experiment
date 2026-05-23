@@ -54,6 +54,7 @@ const settings = {
   colors: [],
   // dataUrl: null,
   inputs: {},
+  shortCuts: {},
   prev: [],
   erase: false,
   fill: false,
