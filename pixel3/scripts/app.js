@@ -14,7 +14,7 @@ import { mouse } from './utils.js'
 // TODO palettes / presets
 
 window.addEventListener('DOMContentLoaded', ()=> {
-   elements.windows = {
+  elements.windows = {
     colors: new NavWindow({
       name: 'colors',
       container: elements.body,
