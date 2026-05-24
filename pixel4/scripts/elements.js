@@ -131,12 +131,24 @@ const settings = {
       selectAction: nav => nav.artboard.switchArtboard(),
     })
   },
+  calculateColumnAndOffset(boards) {
+    return boards.reduce(
+      (acc, w) => {
+        acc.column += w.artboard.column
+        acc.offsets.push(acc.column)
+        return acc
+      },
+      {
+        offsets: [],
+        column: 0,
+      }
+    )
+  },
   combineArtboards() {
-    const offsets = []
-    this.inputs.column.value = elements.artboardWindows.reduce((acc, w) => {
-      offsets.push(acc + w.artboard.column)
-      return (acc += w.artboard.column)
-    }, 0)
+    const { offsets, column } = this.calculateColumnAndOffset(
+      elements.artboardWindows
+    )
+    this.inputs.column.value = column
 
     this.createNewArtboard()
 
@@ -144,6 +156,27 @@ const settings = {
       const { column, row, drawboard } = w.artboard
       elements.artboard.drawboard.ctx.putImageData(
         drawboard.ctx.getImageData(0, 0, column * this.d, row * this.d),
+        (offsets?.[i - 1] || 0) * this.d,
+        0
+      )
+    })
+    elements.artboard.drawboard.extractColors()
+    this.inputs.colors.value = this.colors
+  },
+  combineLayers() {
+    const { offsets, column } = this.calculateColumnAndOffset(
+      elements.artboard.layers
+    )
+    this.inputs.column.value = column
+
+    const currentLayers = elements.artboard.layers
+
+    this.createNewArtboard()
+
+    currentLayers.forEach((w, i) => {
+      const { column, row } = w.artboard
+      elements.artboard.drawboard.ctx.putImageData(
+        w.ctx.getImageData(0, 0, column * this.d, row * this.d),
         (offsets?.[i - 1] || 0) * this.d,
         0
       )

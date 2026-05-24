@@ -345,6 +345,10 @@ window.addEventListener('DOMContentLoaded', () => {
               elements.artboard.addLayer()
             },
           },
+          {
+            btnText: 'combine',
+            action: () => settings.combineLayers(),
+          },
         ])
         elements.layersUi = Object.assign(document.createElement('div'), {
           className: 'layer-ui',
