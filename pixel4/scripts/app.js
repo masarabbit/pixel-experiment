@@ -4,11 +4,11 @@ import TraceSvg from './classes/traceSvg.js'
 import { settings, elements } from './elements.js'
 import { mouse } from './utils.js'
 import PageObject from './classes/pageObject.js'
+import { LayerNode } from './classes/layer.js'
 
 // TODO add cursor for highlighting hover area (and possibly showing alt)
 // TODO some bugs relating to having multiple artboards (maybe need to have separate places to store colors and data url, since these can get mixed up)
 // TODO bugs relating to undo, since it only considers one artboard
-// TODO enable deleting artboards
 // TODO add more options for combining canvases
 // TODO fix bugs present in the SVG convert (doesn't quite work when there are tranparent holes)
 
@@ -347,8 +347,8 @@ window.addEventListener('DOMContentLoaded', () => {
             },
           },
           {
-            btnText: 'combine',
-            action: () => settings.combineLayers(),
+            btnText: 'create sprite',
+            action: () => settings.createSpriteSheet(),
           },
         ])
         elements.layersUi = {
@@ -357,46 +357,19 @@ window.addEventListener('DOMContentLoaded', () => {
           }),
           nodes: [],
         }
-        console.log(elements.artboard.layers)
         nav.contentWrapper.append(elements.layersUi.el)
-        const offset = 100
-
-        new Array(4).fill('').forEach((_, i) => {
-          // TODO make this a new nodeClass
-          // TODO - note that node position do not persist save (which is prob fine...)
-          const node = new PageObject({
-            el: Object.assign(document.createElement('div'), {
-              className: 'layer-node',
-              innerHTML: i,
-            }),
-            canMove: true,
-            x: 6,
-            y: offset + i * 40,
-          })
-          elements.layersUi.nodes.push(node)
-          elements.layersUi.el.append(node.el)
-          node.addDragEvent()
-          node.setStyles()
-          node.releaseAction = () => {
-            elements.layersUi.nodes
-              .sort((a, b) => a.y - b.y)
-              .forEach((node, i) => {
-                node.x = 6
-                node.y = offset + i * 40
-                node.setStyles()
-              })
-          }
-        })
+        new LayerNode({ i: 0 })
       },
     }),
   }
 
-  // const updateLayerUi = () => {
-  //   elements.layersUi.innerHTML = elements.artboard.layers.reduce((acc, l) => {
-  //     acc += `<div><img style="width: 40px; height: auto; background-color: #fff;" src=${l.el.toDataURL()} /></div>`
-  //     return acc
-  //   }, '')
-  // }
+  // TODO 'layers' gets mixed up when you switch artboard
+  // TODO move this to elements
+  const updateLayerUi = () => {
+    elements.layersUi.nodes.forEach(node => {
+      node.img.src = elements.artboard.layers[node.id].el.toDataURL()
+    })
+  }
 
   document.querySelectorAll('button').forEach(b => {
     // TODO ref can be used to create a list of shortCut
@@ -419,6 +392,14 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pointerdown', e => {
     if (e.target === elements.artboard.drawboard.el)
       elements.artboard.draw = true
+
+    const draggableEl = elements.draggableElements.find(
+      el => el.el === e.target
+    )
+
+    if (draggableEl) {
+      draggableEl.onGrab(e)
+    }
   })
 
   window.addEventListener('pointerup', e => {
@@ -444,7 +425,7 @@ window.addEventListener('DOMContentLoaded', () => {
   settings.recordState()
   mouse.up(document, 'add', () => {
     settings.recordState()
-    // updateLayerUi()
+    updateLayerUi()
   })
 
   // TODO enable layers to be moved around, layer opacity to be changed

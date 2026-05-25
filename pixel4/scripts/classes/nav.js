@@ -15,6 +15,9 @@ class NavWindow extends PageObject {
               ${
                 props.selectAction ? '<button class="select-btn"></button>' : ''
               }
+              ${
+                props.deleteAction ? '<button class="delete-btn"></button>' : ''
+              }
               <button class="arrow"></button>
             </div>
           </div>
@@ -37,6 +40,11 @@ class NavWindow extends PageObject {
       this.window
         .querySelector('.select-btn')
         .addEventListener('click', () => this.selectAction(this))
+
+    if (this.deleteAction)
+      this.window
+        .querySelector('.delete-btn')
+        .addEventListener('click', () => this.deleteAction(this))
 
     this.setStyles()
     this.addDragEvent()

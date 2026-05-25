@@ -1,5 +1,5 @@
 import { px, nearestN, roundedClient, mouse } from '../utils.js'
-import { settings } from '../elements.js'
+import { settings, elements } from '../elements.js'
 
 class PageObject {
   constructor(props) {
@@ -59,10 +59,10 @@ class PageObject {
     }
   }
   addDragEvent() {
-    mouse.down(this.el, 'add', this.onGrab)
+    // mouse.down(this.el, 'add', this.onGrab)
+    elements.draggableElements.push(this)
   }
-  drag = (e, x, y) => {
-    if (e.type[0] === 'm') e.preventDefault()
+  drag = (x, y) => {
     this.grabPos.a.x = this.grabPos.b.x - x
     this.grabPos.a.y = this.grabPos.b.y - y
     this.x -= this.grabPos.a.x
@@ -70,19 +70,23 @@ class PageObject {
     this.setStyles()
   }
   onGrab = e => {
-    this.grabPos.b = this.touchPos(e)
-    mouse.up(document, 'add', this.onLetGo)
-    mouse.move(document, 'add', this.onDrag)
+    this.grabPos.b = { x: e.pageX, y: e.pageY }
+    ;['pointerup', 'pointercancel'].forEach(action =>
+      this.el.addEventListener(action, this.onLetGo)
+    )
+    this.el.addEventListener('pointermove', this.onDrag)
   }
   onDrag = e => {
-    const { x, y } = this.touchPos(e)
-    this.canMove ? this.drag(e, x, y) : this.resizeBox(e)
-    this.grabPos.b.x = x
-    this.grabPos.b.y = y
+    e.target.setPointerCapture(e.pointerId)
+    this.canMove ? this.drag(e.pageX, e.pageY) : this.resizeBox(e)
+    this.grabPos.b.x = e.pageX
+    this.grabPos.b.y = e.pageY
   }
   onLetGo = () => {
-    mouse.up(document, 'remove', this.onLetGo)
-    mouse.move(document, 'remove', this.onDrag)
+    ;['pointerup', 'pointercancel'].forEach(action =>
+      this.el.removeEventListener(action, this.onLetGo)
+    )
+    this.el.removeEventListener('pointermove', this.onDrag)
     if (this.releaseAction) this.releaseAction()
   }
   resizeBox = e => {

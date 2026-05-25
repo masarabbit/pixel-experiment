@@ -6,6 +6,7 @@ const elements = {
   artboard: null,
   layerUi: null,
   artboardWindows: [],
+  draggableElements: [],
   windows: {},
   saveDataName: 'window-pos',
   saveData() {
@@ -111,6 +112,7 @@ const settings = {
     }
   },
   createNewArtboard() {
+    // TODO artboard name is not correct anymore since the length can change
     return new NavWindow({
       name: 'artboard' + (elements.artboardWindows.length + 1),
       container: elements.body,
@@ -129,6 +131,18 @@ const settings = {
         elements.artboardWindows.push(nav)
       },
       selectAction: nav => nav.artboard.switchArtboard(),
+      deleteAction: nav => {
+        if (elements.artboardWindows.length === 1) return
+        elements.artboardWindows = elements.artboardWindows.filter(
+          w => w !== nav
+        )
+        elements.draggableElements = elements.draggableElements.filter(
+          el => el !== nav
+        )
+        nav.artboard.el.remove()
+        nav.window.remove()
+        elements.artboardWindows[0].artboard.switchArtboard()
+      },
     })
   },
   calculateColumnAndOffset(boards) {
@@ -163,7 +177,7 @@ const settings = {
     elements.artboard.drawboard.extractColors()
     this.inputs.colors.value = this.colors
   },
-  combineLayers() {
+  createSpriteSheet() {
     const { offsets, column } = this.calculateColumnAndOffset(
       elements.artboard.layers
     )

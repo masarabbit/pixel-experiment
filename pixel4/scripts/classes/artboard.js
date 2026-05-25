@@ -1,6 +1,7 @@
 import { nearestN, rgbToHex, hex, mouse, roundedClient } from '../utils.js'
 import PageObject from './pageObject.js'
 import { elements, settings } from '../elements.js'
+import { LayerNode } from './layer.js'
 
 class Canvas extends PageObject {
   constructor(props) {
@@ -212,6 +213,7 @@ class Artboard extends PageObject {
       })
     )
     this.currentLayer = this.layers.length - 1
+    new LayerNode({ i: this.currentLayer })
   }
   remove() {
     this.elements.artboardWindows = this.elements.artboardWindows.filter(
