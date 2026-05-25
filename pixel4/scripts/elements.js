@@ -4,7 +4,7 @@ import { NavWindow } from './classes/nav.js'
 const elements = {
   body: document.querySelector('body'),
   artboard: null,
-  layerUi: null,
+  layersUi: null,
   artboardWindows: [],
   draggableElements: [],
   windows: {},
@@ -42,10 +42,16 @@ const elements = {
       this.artboard.resize()
     }
   },
-  updateLayerUi() {
+  updateLayersUi() {
     this.artboard.layerNodes.forEach(node => {
-      node.img.src = this.artboard.layers[node.id].el.toDataURL()
+      if (node && this.artboard.layers[node.id]?.el)
+        node.img.src = this.artboard.layers[node.id].el.toDataURL()
     })
+  },
+  removeLayerNodes() {
+    if (this?.artboard?.layerNodes.length) {
+      this.artboard.layerNodes.forEach(node => node.el.remove())
+    }
   },
 }
 
@@ -117,6 +123,7 @@ const settings = {
     }
   },
   createNewArtboard() {
+    elements.removeLayerNodes()
     // TODO artboard name is not correct anymore since the length can change
     return new NavWindow({
       name: 'artboard' + (elements.artboardWindows.length + 1),
@@ -137,7 +144,7 @@ const settings = {
       },
       selectAction: nav => nav.artboard.switchArtboard(),
       deleteAction: nav => {
-        if (elements.artboardWindows.length === 1) return
+        if (elements.artboardWindows.length <= 1) return
         elements.artboardWindows = elements.artboardWindows.filter(
           w => w !== nav
         )
@@ -187,14 +194,22 @@ const settings = {
       elements.artboard.layers
     )
     this.inputs.column.value = column
-    const currentLayers = elements.artboard.layers
+
+    //* We need to remember current artboard because creating a new one switches it.
+    const currentArtboard = elements.artboard
 
     this.createNewArtboard()
+    const { column: col, row } = currentArtboard.layers[0]
+    currentArtboard.layerNodes.forEach((w, i) => {
+      console.log('test', currentArtboard.layers[w.id])
 
-    currentLayers.forEach((w, i) => {
-      const { column, row } = w.artboard
       elements.artboard.drawboard.ctx.putImageData(
-        w.ctx.getImageData(0, 0, column * this.d, row * this.d),
+        currentArtboard.layers[w.id].ctx.getImageData(
+          0,
+          0,
+          col * this.d,
+          row * this.d
+        ),
         (offsets?.[i - 1] || 0) * this.d,
         0
       )

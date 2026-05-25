@@ -103,7 +103,6 @@ window.addEventListener('DOMContentLoaded', () => {
           el: Object.assign(document.createElement('div'), {
             className: 'layer-ui',
           }),
-          // nodes: [],
         }
         nav.contentWrapper.append(elements.layersUi.el)
       },
@@ -378,6 +377,8 @@ window.addEventListener('DOMContentLoaded', () => {
       elements.artboard.createSelectBox(e)
     } else if (e.target === elements.artboard.drawboard.el) {
       elements.artboard.colorCell(e)
+    } else if (e.target?.dataset?.type === 'delete') {
+      elements.artboard.deleteLayerNode(+e.target.dataset.id)
     }
   })
 
@@ -397,6 +398,13 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pointerup', e => {
     if (e.target === elements.artboard.drawboard.el)
       elements.artboard.draw = false
+
+    //TODO move this? toggle layer show
+    if (e.target?.dataset?.type === 'show') {
+      elements.artboard.layers[+e.target.dataset.id].el.classList[
+        e.target.checked ? 'add' : 'remove'
+      ]('d-none')
+    }
   })
 
   window.addEventListener('pointercancel', () => {
@@ -406,6 +414,12 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pointermove', e => {
     if (e.target === elements.artboard.drawboard.el)
       elements.artboard.continuousDraw(e)
+
+    //TODO move this? toggle layer opacity
+    if (e.target?.dataset?.type === 'opacity') {
+      elements.artboard.layers[+e.target.dataset.id].el.style.opacity =
+        1 * (e.target.value / 100)
+    }
   })
 
   window.addEventListener('keyup', e => {
@@ -417,8 +431,6 @@ window.addEventListener('DOMContentLoaded', () => {
   settings.recordState()
   mouse.up(document, 'add', () => {
     settings.recordState()
-    elements.updateLayerUi()
+    elements.updateLayersUi()
   })
-
-  // TODO enable layers to be moved around, layer opacity to be changed
 })

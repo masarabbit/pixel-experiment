@@ -52,10 +52,10 @@ class PageObject {
     // TODO note that this doesn't necessarily clear the object
     this.el.remove()
   }
-  touchPos(e) {
+  touchPos(x, y) {
     return {
-      x: nearestN(roundedClient(e, 'X'), settings.d),
-      y: nearestN(roundedClient(e, 'Y'), settings.d),
+      x: nearestN(x, settings.d),
+      y: nearestN(y, settings.d),
     }
   }
   addDragEvent() {
@@ -63,14 +63,15 @@ class PageObject {
     elements.draggableElements.push(this)
   }
   drag = (x, y) => {
-    this.grabPos.a.x = this.grabPos.b.x - x
-    this.grabPos.a.y = this.grabPos.b.y - y
+    const { x: rX, y: rY } = this.touchPos(x, y)
+    this.grabPos.a.x = this.grabPos.b.x - rX
+    this.grabPos.a.y = this.grabPos.b.y - rY
     this.x -= this.grabPos.a.x
     this.y -= this.grabPos.a.y
     this.setStyles()
   }
   onGrab = e => {
-    this.grabPos.b = { x: e.pageX, y: e.pageY }
+    this.grabPos.b = this.touchPos(e.pageX, e.pageY)
     ;['pointerup', 'pointercancel'].forEach(action =>
       this.el.addEventListener(action, this.onLetGo)
     )
@@ -78,9 +79,10 @@ class PageObject {
   }
   onDrag = e => {
     e.target.setPointerCapture(e.pointerId)
-    this.canMove ? this.drag(e.pageX, e.pageY) : this.resizeBox(e)
-    this.grabPos.b.x = e.pageX
-    this.grabPos.b.y = e.pageY
+    const { x, y } = this.touchPos(e.pageX, e.pageY)
+    this.canMove ? this.drag(x, y) : this.resizeBox(e)
+    this.grabPos.b.x = x
+    this.grabPos.b.y = y
   }
   onLetGo = () => {
     ;['pointerup', 'pointercancel'].forEach(action =>

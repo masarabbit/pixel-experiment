@@ -167,7 +167,7 @@ class Artboard extends PageObject {
       gridColor: '#78ddf7',
       layers: [],
       layerNodes: [],
-      currentLayer: 0,
+      layerIndex: 0,
       ...props,
     })
     elements.artboard = this
@@ -200,23 +200,25 @@ class Artboard extends PageObject {
     this.refresh()
   }
   get drawboard() {
-    return this.layers[this.currentLayer]
+    return this.layers[this.layerIndex]
   }
   addLayer() {
     this.layers.push(
       new Canvas({
         artboard: this,
-        before: this.layers[this.layers.length - 1].el,
+        // before: this.layers[this.layers.length - 1].el,
+        container: this.el,
         className: 'drawboard',
         w: this.w,
         h: this.h,
         d: this.d,
       })
     )
-    this.currentLayer = this.layers.length - 1
+    this.layerIndex = this.layers.length - 1
 
-    new LayerNode({ i: this.currentLayer, artboard: this })
+    new LayerNode({ i: this.layerIndex, artboard: this })
     this.refresh()
+    // this.layers[0].re
   }
   remove() {
     this.elements.artboardWindows = this.elements.artboardWindows.filter(
@@ -331,7 +333,7 @@ class Artboard extends PageObject {
     this.paintFromColors()
     // populatePalette(artData.colors)
 
-    elements.updateLayerUi()
+    elements.updateLayersUi()
   }
   outputFromImage = () => {
     if (!this.uploadedFile) return
@@ -436,10 +438,7 @@ class Artboard extends PageObject {
       this.selectBox.paintFromColors()
       elements.artboard.toggleSelectState()
     }
-    // remove layerNode
-    if (elements.artboard.layerNodes.length) {
-      elements.artboard.layerNodes.forEach(node => node.el.remove())
-    }
+    elements.removeLayerNodes()
     elements.artboard = this
     // add layerNode from new layer
     if (this.layerNodes.length) {
@@ -453,6 +452,20 @@ class Artboard extends PageObject {
     ;['column', 'row'].forEach(prop => {
       settings.inputs[prop].value = elements.artboard[prop]
     })
+  }
+  deleteLayerNode(i) {
+    // TODO this could have a bug, may need to refactor to decouple id and index, or reassign index when node is deleted
+    if (this.layers.length <= 1) return
+
+    const layerNode = this.layerNodes.find(n => n?.id === i)
+
+    this.layers[layerNode.id].el.remove()
+    this.layers = this.layers.map((l, i) => (i === layerNode?.id ? null : l))
+    layerNode.el.remove()
+
+    this.layerNodes = this.layerNodes.map(n => (n?.id === i ? null : n))
+    this.layerIndex = this.layerNodes.findIndex(n => n)
+    this.layerNodes[this.layerIndex].releaseAction()
   }
 }
 

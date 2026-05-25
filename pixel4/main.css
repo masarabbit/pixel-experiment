@@ -470,11 +470,14 @@ textarea {
   cursor: grab;
   position: absolute;
   height: 40px;
-  background-color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .layer-ui img {
   height: 40px;
   width: auto;
   pointer-events: none;
+  background-color: #fff;
 }

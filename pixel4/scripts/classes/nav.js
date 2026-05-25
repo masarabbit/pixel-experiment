@@ -56,10 +56,11 @@ class NavWindow extends PageObject {
     this.window.classList[this.isOpen ? 'remove' : 'add']('close')
     elements.saveData()
   }
-  touchPos(e) {
+  touchPos(x, y) {
+    //* setting as is so it doesn't lock to settings.d
     return {
-      x: roundedClient(e, 'X'),
-      y: roundedClient(e, 'Y'),
+      x,
+      y,
     }
   }
   setStyles() {
