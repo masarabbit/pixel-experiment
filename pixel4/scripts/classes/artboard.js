@@ -213,7 +213,9 @@ class Artboard extends PageObject {
       })
     )
     this.currentLayer = this.layers.length - 1
+
     new LayerNode({ i: this.currentLayer })
+    this.refresh()
   }
   remove() {
     this.elements.artboardWindows = this.elements.artboardWindows.filter(
@@ -288,17 +290,27 @@ class Artboard extends PageObject {
     if (this.draw) this.colorCell(e)
   }
   resize() {
-    ;((this.w = settings.column * settings.d),
-      (this.h = settings.row * settings.d),
-      (this.d = settings.d))
+    const prev = {
+      w: this.w,
+      h: this.h,
+    }
+    this.w = settings.column * settings.d
+    this.h = settings.row * settings.d
+    this.d = settings.d
     this.setStyles()
-    // this.drawboard.resizeCanvas(this.size)
-    this.layers.forEach(layer => layer.resizeCanvas(this.size))
+    this.layers.forEach((layer, i) => {
+      const img = elements.layersUi.nodes.find(n => n.id === i).img
+      layer.resizeCanvas(this.size)
+      layer.ctx.drawImage(img, 0, 0, prev.w, prev.h)
+    })
     this.overlay.resizeCanvas(this.size)
     this.overlay.drawGrid()
   }
   resizeAndPaintCanvas() {
-    ;['resize', 'paintCanvas'].forEach(action => this[action]())
+    // ;['resize', 'paintCanvas'].forEach(action => this[action]())
+    this.resize()
+    this.drawboard.extractColors()
+    settings.inputs.colors.value = settings.colors
   }
   paintFromColors() {
     const { d } = settings

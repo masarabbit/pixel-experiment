@@ -36,9 +36,5 @@ export class LayerNode extends PageObject {
         node.y = this.offset + i * this.defH
         node.setStyles()
       })
-
-    //  elements.artboard.layers.sort((a, b) => {
-
-    //  })
   }
 }

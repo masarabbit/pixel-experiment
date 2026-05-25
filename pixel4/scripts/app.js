@@ -351,6 +351,8 @@ window.addEventListener('DOMContentLoaded', () => {
             action: () => settings.createSpriteSheet(),
           },
         ])
+
+        // TODO move this to each artboards
         elements.layersUi = {
           el: Object.assign(document.createElement('div'), {
             className: 'layer-ui',
@@ -388,7 +390,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  // TODO possibly move this elsewhere
   window.addEventListener('pointerdown', e => {
     if (e.target === elements.artboard.drawboard.el)
       elements.artboard.draw = true
