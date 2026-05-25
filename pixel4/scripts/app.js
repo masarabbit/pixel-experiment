@@ -3,6 +3,7 @@ import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { settings, elements } from './elements.js'
 import { mouse } from './utils.js'
+import PageObject from './classes/pageObject.js'
 
 // TODO add cursor for highlighting hover area (and possibly showing alt)
 // TODO some bugs relating to having multiple artboards (maybe need to have separate places to store colors and data url, since these can get mixed up)
@@ -350,21 +351,52 @@ window.addEventListener('DOMContentLoaded', () => {
             action: () => settings.combineLayers(),
           },
         ])
-        elements.layersUi = Object.assign(document.createElement('div'), {
-          className: 'layer-ui',
-        })
+        elements.layersUi = {
+          el: Object.assign(document.createElement('div'), {
+            className: 'layer-ui',
+          }),
+          nodes: [],
+        }
         console.log(elements.artboard.layers)
-        nav.contentWrapper.append(elements.layersUi)
+        nav.contentWrapper.append(elements.layersUi.el)
+        const offset = 100
+
+        new Array(4).fill('').forEach((_, i) => {
+          // TODO make this a new nodeClass
+          // TODO - note that node position do not persist save (which is prob fine...)
+          const node = new PageObject({
+            el: Object.assign(document.createElement('div'), {
+              className: 'layer-node',
+              innerHTML: i,
+            }),
+            canMove: true,
+            x: 6,
+            y: offset + i * 40,
+          })
+          elements.layersUi.nodes.push(node)
+          elements.layersUi.el.append(node.el)
+          node.addDragEvent()
+          node.setStyles()
+          node.releaseAction = () => {
+            elements.layersUi.nodes
+              .sort((a, b) => a.y - b.y)
+              .forEach((node, i) => {
+                node.x = 6
+                node.y = offset + i * 40
+                node.setStyles()
+              })
+          }
+        })
       },
     }),
   }
 
-  const updateLayerUi = () => {
-    elements.layersUi.innerHTML = elements.artboard.layers.reduce((acc, l) => {
-      acc += `<div><img style="width: 40px; height: auto; background-color: #fff;" src=${l.el.toDataURL()} /></div>`
-      return acc
-    }, '')
-  }
+  // const updateLayerUi = () => {
+  //   elements.layersUi.innerHTML = elements.artboard.layers.reduce((acc, l) => {
+  //     acc += `<div><img style="width: 40px; height: auto; background-color: #fff;" src=${l.el.toDataURL()} /></div>`
+  //     return acc
+  //   }, '')
+  // }
 
   document.querySelectorAll('button').forEach(b => {
     // TODO ref can be used to create a list of shortCut
@@ -412,6 +444,8 @@ window.addEventListener('DOMContentLoaded', () => {
   settings.recordState()
   mouse.up(document, 'add', () => {
     settings.recordState()
-    updateLayerUi()
+    // updateLayerUi()
   })
+
+  // TODO enable layers to be moved around, layer opacity to be changed
 })

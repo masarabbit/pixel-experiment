@@ -83,6 +83,7 @@ class PageObject {
   onLetGo = () => {
     mouse.up(document, 'remove', this.onLetGo)
     mouse.move(document, 'remove', this.onDrag)
+    if (this.releaseAction) this.releaseAction()
   }
   resizeBox = e => {
     const { defPos } = this

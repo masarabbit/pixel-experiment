@@ -1,6 +1,6 @@
 const nearestN = (x, n) => (x === 0 ? 0 : x - 1 + Math.abs(((x - 1) % n) - n))
 const isNum = x => typeof x === 'number'
-const px = n => `${n}px`
+const px = n => (!isNaN(n) ? `${Math.round(n)}px` : '')
 
 // const n = Math.round(255 / 3)
 const n = 1

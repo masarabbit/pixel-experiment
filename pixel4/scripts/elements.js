@@ -168,7 +168,6 @@ const settings = {
       elements.artboard.layers
     )
     this.inputs.column.value = column
-
     const currentLayers = elements.artboard.layers
 
     this.createNewArtboard()
