@@ -22,14 +22,14 @@ export class LayerNode extends PageObject {
       ...props,
     })
     this.img = this.el.querySelector('img')
-    elements.layersUi.nodes.push(this)
+    this.artboard.layerNodes.push(this)
     elements.layersUi.el.append(this.el)
-    this.img.src = elements.artboard.layers[this.id].el.toDataURL()
+    this.img.src = this.artboard.layers[this.id].el.toDataURL()
     this.addDragEvent()
     this.setStyles()
   }
   releaseAction() {
-    elements.layersUi.nodes
+    this.artboard.layerNodes
       .sort((a, b) => a.y - b.y)
       .forEach((node, i) => {
         node.x = this.defX

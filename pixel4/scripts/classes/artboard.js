@@ -166,6 +166,7 @@ class Artboard extends PageObject {
       // gridColor: '#fbcda2',
       gridColor: '#78ddf7',
       layers: [],
+      layerNodes: [],
       currentLayer: 0,
       ...props,
     })
@@ -184,7 +185,7 @@ class Artboard extends PageObject {
         d: this.d,
       })
     )
-    // this.addLayer()
+    new LayerNode({ i: 0, artboard: this })
 
     this.overlay = new Canvas({
       artboard: this,
@@ -214,7 +215,7 @@ class Artboard extends PageObject {
     )
     this.currentLayer = this.layers.length - 1
 
-    new LayerNode({ i: this.currentLayer })
+    new LayerNode({ i: this.currentLayer, artboard: this })
     this.refresh()
   }
   remove() {
@@ -299,7 +300,7 @@ class Artboard extends PageObject {
     this.d = settings.d
     this.setStyles()
     this.layers.forEach((layer, i) => {
-      const img = elements.layersUi.nodes.find(n => n.id === i).img
+      const img = this.layerNodes.find(n => n.id === i).img
       layer.resizeCanvas(this.size)
       layer.ctx.drawImage(img, 0, 0, prev.w, prev.h)
     })
@@ -329,6 +330,8 @@ class Artboard extends PageObject {
     this.drawboard.ctx.clearRect(0, 0, column * d, row * d)
     this.paintFromColors()
     // populatePalette(artData.colors)
+
+    elements.updateLayerUi()
   }
   outputFromImage = () => {
     if (!this.uploadedFile) return
@@ -433,7 +436,15 @@ class Artboard extends PageObject {
       this.selectBox.paintFromColors()
       elements.artboard.toggleSelectState()
     }
+    // remove layerNode
+    if (elements.artboard.layerNodes.length) {
+      elements.artboard.layerNodes.forEach(node => node.el.remove())
+    }
     elements.artboard = this
+    // add layerNode from new layer
+    if (this.layerNodes.length) {
+      this.layerNodes.forEach(node => elements.layersUi.el.append(node.el))
+    }
     elements.artboardWindows.forEach(w => {
       w.window.classList[w.artboard === this ? 'add' : 'remove']('current')
     })

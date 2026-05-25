@@ -42,6 +42,11 @@ const elements = {
       this.artboard.resize()
     }
   },
+  updateLayerUi() {
+    this.artboard.layerNodes.forEach(node => {
+      node.img.src = this.artboard.layers[node.id].el.toDataURL()
+    })
+  },
 }
 
 const settings = {

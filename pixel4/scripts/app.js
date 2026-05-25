@@ -77,6 +77,37 @@ window.addEventListener('DOMContentLoaded', () => {
         })
       },
     }),
+    layer: new NavWindow({
+      name: 'layer',
+      container: elements.body,
+      isVertical: true,
+      x: 580,
+      y: 180,
+      isOpen: true,
+      content: nav => {
+        nav.addButtons([
+          {
+            btnText: 'add layer',
+            action: () => {
+              elements.artboard.addLayer()
+            },
+          },
+          {
+            btnText: 'create sprite',
+            action: () => settings.createSpriteSheet(),
+          },
+        ])
+
+        // TODO move this to each artboards
+        elements.layersUi = {
+          el: Object.assign(document.createElement('div'), {
+            className: 'layer-ui',
+          }),
+          // nodes: [],
+        }
+        nav.contentWrapper.append(elements.layersUi.el)
+      },
+    }),
     artboard: settings.createNewArtboard(),
     main: new NavWindow({
       name: 'main',
@@ -331,46 +362,6 @@ window.addEventListener('DOMContentLoaded', () => {
           },
         ]),
     }),
-    layer: new NavWindow({
-      name: 'layer',
-      container: elements.body,
-      isVertical: true,
-      x: 580,
-      y: 180,
-      isOpen: true,
-      content: nav => {
-        nav.addButtons([
-          {
-            btnText: 'add layer',
-            action: () => {
-              elements.artboard.addLayer()
-            },
-          },
-          {
-            btnText: 'create sprite',
-            action: () => settings.createSpriteSheet(),
-          },
-        ])
-
-        // TODO move this to each artboards
-        elements.layersUi = {
-          el: Object.assign(document.createElement('div'), {
-            className: 'layer-ui',
-          }),
-          nodes: [],
-        }
-        nav.contentWrapper.append(elements.layersUi.el)
-        new LayerNode({ i: 0 })
-      },
-    }),
-  }
-
-  // TODO 'layers' gets mixed up when you switch artboard
-  // TODO move this to elements
-  const updateLayerUi = () => {
-    elements.layersUi.nodes.forEach(node => {
-      node.img.src = elements.artboard.layers[node.id].el.toDataURL()
-    })
   }
 
   document.querySelectorAll('button').forEach(b => {
@@ -426,7 +417,7 @@ window.addEventListener('DOMContentLoaded', () => {
   settings.recordState()
   mouse.up(document, 'add', () => {
     settings.recordState()
-    updateLayerUi()
+    elements.updateLayerUi()
   })
 
   // TODO enable layers to be moved around, layer opacity to be changed
