@@ -6,7 +6,7 @@ export class LayerNode extends PageObject {
   constructor(props) {
     const offset = 100
     const defX = 6
-    const defH = 40
+    const defH = 42
     super({
       el: Object.assign(document.createElement('div'), {
         className: 'layer-node',
