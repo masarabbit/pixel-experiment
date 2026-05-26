@@ -190,30 +190,34 @@ const settings = {
     this.inputs.colors.value = this.colors
   },
   createSpriteSheet() {
+    //* We need to remember current artboard because creating a new one switches it.
+    const currentArtboard = elements.artboard
     const { offsets, column } = this.calculateColumnAndOffset(
-      elements.artboard.layers
+      elements.artboard.layers.filter(
+        (w, i) =>
+          currentArtboard.layerNodes
+            .find(n => n.id === i)
+            ?.el.querySelector('input[type="checkbox"]').checked
+      )
     )
     this.inputs.column.value = column
 
-    //* We need to remember current artboard because creating a new one switches it.
-    const currentArtboard = elements.artboard
-
     this.createNewArtboard()
     const { column: col, row } = currentArtboard.layers[0]
-    currentArtboard.layerNodes.forEach((w, i) => {
-      console.log('test', currentArtboard.layers[w.id])
-
-      elements.artboard.drawboard.ctx.putImageData(
-        currentArtboard.layers[w.id].ctx.getImageData(
-          0,
-          0,
-          col * this.d,
-          row * this.d
-        ),
-        (offsets?.[i - 1] || 0) * this.d,
-        0
-      )
-    })
+    currentArtboard.layerNodes
+      .filter(w => w?.el.querySelector('input[type="checkbox"]').checked)
+      .forEach((w, i) => {
+        elements.artboard.drawboard.ctx.putImageData(
+          currentArtboard.layers[w.id].ctx.getImageData(
+            0,
+            0,
+            col * this.d,
+            row * this.d
+          ),
+          (offsets?.[i - 1] || 0) * this.d,
+          0
+        )
+      })
     elements.artboard.drawboard.extractColors()
     this.inputs.colors.value = this.colors
   },

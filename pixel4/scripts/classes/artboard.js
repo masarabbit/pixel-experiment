@@ -410,12 +410,14 @@ class Artboard extends PageObject {
     )
   }
   flipHorizontal() {
+    this.drawboard.extractColors()
     settings.inputs.colors.value = settings.splitColors
       .map(a => a.reverse())
       .flat(1)
     this.paintCanvas()
   }
   flipVertical() {
+    this.drawboard.extractColors()
     settings.inputs.colors.value = settings.splitColors.reverse().flat(1)
     this.paintCanvas()
   }

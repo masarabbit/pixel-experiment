@@ -254,14 +254,14 @@ window.addEventListener('DOMContentLoaded', () => {
           {
             className: 'flip-h',
             action: () => {
-              if (elements.artboard.selectBox.copyData.length)
+              if (elements.artboard?.selectBox?.copyData.length)
                 elements.artboard.selectBox.flipHorizontal()
             },
           },
           {
             className: 'flip-v',
             action: () => {
-              if (elements.artboard.selectBox.copyData.length)
+              if (elements.artboard?.selectBox?.copyData.length)
                 elements.artboard.selectBox.flipVertical()
             },
           },
