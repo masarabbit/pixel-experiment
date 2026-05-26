@@ -387,8 +387,12 @@ window.addEventListener('DOMContentLoaded', () => {
       elements.artboard.createSelectBox(e)
     } else if (e.target === elements.artboard.drawboard.el) {
       elements.artboard.colorCell(e)
-    } else if (e.target?.dataset?.type === 'delete') {
-      elements.artboard.deleteLayerNode(+e.target.dataset.id)
+    } else if (
+      e.target?.dataset?.type === 'delete' &&
+      elements.artboard.activeLayers.length > 1
+    ) {
+      if (window.confirm('are you sure?'))
+        elements.artboard.deleteLayerNode(+e.target.dataset.id)
     }
   })
 
