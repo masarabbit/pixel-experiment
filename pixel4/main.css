@@ -125,6 +125,10 @@ button {
   font-size: 15px;
 }
 
+button[data-type='delete'] {
+  color: #fff;
+}
+
 input {
   background-color: #fff;
   color: black;
@@ -480,4 +484,29 @@ textarea {
   width: auto;
   pointer-events: none;
   background-color: #fff;
+}
+
+.preview {
+  --w: 20px;
+  --h: 20px;
+  --m: 2;
+  --width: calc(var(--w) * var(--m));
+  --height: calc(var(--h) * var(--m));
+  width: var(--width);
+  height: var(--height);
+  pointer-events: none;
+  background-color: #fff;
+  --frame-no: 2;
+  background-size: calc(var(--width) * var(--frame-no)) var(--height);
+  animation: frame-animation infinite 0.5s steps(var(--frame-no));
+  image-rendering: pixelated;
+}
+
+@keyframes frame-animation {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: calc(-1 * var(--width) * var(--frame-no)) 0px;
+  }
 }

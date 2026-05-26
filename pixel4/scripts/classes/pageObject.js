@@ -1,4 +1,4 @@
-import { px, nearestN, roundedClient, mouse } from '../utils.js'
+import { px, nearestN } from '../utils.js'
 import { settings, elements } from '../elements.js'
 
 class PageObject {
@@ -59,7 +59,6 @@ class PageObject {
     }
   }
   addDragEvent() {
-    // mouse.down(this.el, 'add', this.onGrab)
     elements.draggableElements.push(this)
   }
   drag = (x, y) => {

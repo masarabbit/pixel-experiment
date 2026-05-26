@@ -1,4 +1,4 @@
-import { nearestN, rgbToHex, hex, mouse, roundedClient } from '../utils.js'
+import { nearestN, rgbToHex, hex } from '../utils.js'
 import PageObject from './pageObject.js'
 import { elements, settings } from '../elements.js'
 import { LayerNode } from './layer.js'
@@ -444,7 +444,9 @@ class Artboard extends PageObject {
     elements.artboard = this
     // add layerNode from new layer
     if (this.layerNodes.length) {
-      this.layerNodes.forEach(node => elements.layersUi.el.append(node.el))
+      this.layerNodes.forEach(
+        node => node && elements.layersUi.el.append(node.el)
+      )
     }
     elements.artboardWindows.forEach(w => {
       w.window.classList[w.artboard === this ? 'add' : 'remove']('current')

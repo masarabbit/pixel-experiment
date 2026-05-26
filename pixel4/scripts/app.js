@@ -2,7 +2,6 @@ import { Input, SizeInput, TextArea, Upload } from './classes/input.js'
 import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { settings, elements } from './elements.js'
-import { mouse } from './utils.js'
 import PageObject from './classes/pageObject.js'
 import { LayerNode } from './classes/layer.js'
 
@@ -81,7 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
       name: 'layer',
       container: elements.body,
       isVertical: true,
-      x: 580,
+      x: 680,
       y: 180,
       isOpen: true,
       content: nav => {
@@ -361,6 +360,17 @@ window.addEventListener('DOMContentLoaded', () => {
           },
         ]),
     }),
+    preview: new NavWindow({
+      name: 'preview',
+      container: elements.body,
+      x: 780,
+      y: 180,
+      isOpen: true,
+      img: Object.assign(document.createElement('div'), {
+        className: 'preview',
+      }),
+      content: nav => nav.contentWrapper.append(nav.img),
+    }),
   }
 
   document.querySelectorAll('button').forEach(b => {
@@ -405,6 +415,10 @@ window.addEventListener('DOMContentLoaded', () => {
         e.target.checked ? 'add' : 'remove'
       ]('d-none')
     }
+
+    settings.recordState()
+    elements.updateLayersUi()
+    elements.saveData()
   })
 
   window.addEventListener('pointercancel', () => {
@@ -429,8 +443,4 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elements.readData()
   settings.recordState()
-  mouse.up(document, 'add', () => {
-    settings.recordState()
-    elements.updateLayersUi()
-  })
 })

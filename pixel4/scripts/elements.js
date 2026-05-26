@@ -1,5 +1,6 @@
 import { Artboard } from './classes/artboard.js'
 import { NavWindow } from './classes/nav.js'
+import { setProperties } from './utils.js'
 
 const elements = {
   body: document.querySelector('body'),
@@ -50,7 +51,7 @@ const elements = {
   },
   removeLayerNodes() {
     if (this?.artboard?.layerNodes.length) {
-      this.artboard.layerNodes.forEach(node => node.el.remove())
+      this.artboard.layerNodes.forEach(node => node && node.el.remove())
     }
   },
 }
@@ -192,14 +193,13 @@ const settings = {
   createSpriteSheet() {
     //* We need to remember current artboard because creating a new one switches it.
     const currentArtboard = elements.artboard
-    const { offsets, column } = this.calculateColumnAndOffset(
-      elements.artboard.layers.filter(
-        (w, i) =>
-          currentArtboard.layerNodes
-            .find(n => n.id === i)
-            ?.el.querySelector('input[type="checkbox"]').checked
-      )
+    const checkedLayers = elements.artboard.layers.filter(
+      (w, i) =>
+        currentArtboard.layerNodes
+          .find(n => n && n.id === i)
+          ?.el.querySelector('input[type="checkbox"]').checked
     )
+    const { offsets, column } = this.calculateColumnAndOffset(checkedLayers)
     this.inputs.column.value = column
 
     this.createNewArtboard()
@@ -220,6 +220,15 @@ const settings = {
       })
     elements.artboard.drawboard.extractColors()
     this.inputs.colors.value = this.colors
+
+    elements.windows.preview.img.style.backgroundImage = `url(${elements.artboard.drawboard.el.toDataURL()})`
+    setProperties(elements.windows.preview.img, {
+      w: col + 'px',
+      h: row + 'px',
+      m: this.d,
+      'frame-no': checkedLayers.length,
+    })
+    console.log(elements.artboard.drawboard.el.toDataURL())
   },
 }
 

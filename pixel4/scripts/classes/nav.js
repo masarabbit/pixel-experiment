@@ -1,6 +1,6 @@
 import PageObject from './pageObject.js'
 import { Button } from './input.js'
-import { px, roundedClient, convertCameCase, mouse } from '../utils.js'
+import { px, convertCameCase } from '../utils.js'
 import { elements } from '../elements.js'
 
 class NavWindow extends PageObject {
@@ -48,8 +48,6 @@ class NavWindow extends PageObject {
 
     this.setStyles()
     this.addDragEvent()
-
-    mouse.up(document, 'add', () => elements.saveData())
   }
   toggleState = () => {
     this.isOpen = !this.isOpen
