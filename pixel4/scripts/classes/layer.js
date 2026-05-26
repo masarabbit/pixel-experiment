@@ -22,11 +22,9 @@ export class LayerNode extends PageObject {
       ...props,
     })
     this.img = this.el.querySelector('img')
-    this.artboard.layerNodes.forEach(n => {
-      if (n) {
-        n.y += this.defH
-        n.setStyles()
-      }
+    this.artboard.activeLayerNodes.forEach(n => {
+      n.y += this.defH
+      n.setStyles()
     })
     elements.layersUi.el.append(this.el)
     this.artboard.layerNodes.push(this)
@@ -46,17 +44,17 @@ export class LayerNode extends PageObject {
     }
   }
   releaseAction() {
-    this.artboard.layerNodes
-      .filter(l => l)
+    this.artboard.activeLayerNodes
       .sort((a, b) => a.y - b.y)
       .forEach((node, i) => {
         if (i === 0) this.artboard.layerIndex = node.id
         node.x = this.defX
         node.y = this.offset + i * this.defH
         this.artboard.layers[node.id].el.style.zIndex =
-          this.artboard.layerNodes.length - i
+          this.artboard.activeLayerNodes.length - i
         node.setStyles()
       })
-    this.artboard.overlay.el.style.zIndex = this.artboard.layerNodes.length + 1
+    this.artboard.overlay.el.style.zIndex =
+      this.artboard.activeLayerNodes.length + 1
   }
 }
