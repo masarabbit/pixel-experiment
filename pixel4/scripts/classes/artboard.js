@@ -202,6 +202,12 @@ class Artboard extends PageObject {
   get drawboard() {
     return this.layers[this.layerIndex]
   }
+  get activeLayers() {
+    return this.layers.filter(l => l)
+  }
+  get activeLayerNodes() {
+    return this.layerNodes.filter(l => l)
+  }
   addLayer() {
     this.layers.push(
       new Canvas({
@@ -301,8 +307,8 @@ class Artboard extends PageObject {
     this.h = settings.row * settings.d
     this.d = settings.d
     this.setStyles()
-    this.layers.forEach((layer, i) => {
-      const img = this.layerNodes.find(n => n.id === i).img
+    this.activeLayers.forEach((layer, i) => {
+      const img = this.activeLayerNodes.find(n => n.id === i).img
       layer.resizeCanvas(this.size)
       layer.ctx.drawImage(img, 0, 0, prev.w, prev.h)
     })
@@ -461,7 +467,7 @@ class Artboard extends PageObject {
     // TODO this could have a bug, may need to refactor to decouple id and index, or reassign index when node is deleted
     if (this.layers.length <= 1) return
 
-    const layerNode = this.layerNodes.find(n => n?.id === i)
+    const layerNode = this.activeLayerNodes.find(n => n.id === i)
 
     this.layers[layerNode.id].el.remove()
     this.layers = this.layers.map((l, i) => (i === layerNode?.id ? null : l))

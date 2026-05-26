@@ -44,14 +44,14 @@ const elements = {
     }
   },
   updateLayersUi() {
-    this.artboard.layerNodes.forEach(node => {
-      if (node && this.artboard.layers[node.id]?.el)
-        node.img.src = this.artboard.layers[node.id].el.toDataURL()
+    this.artboard.activeLayerNodes.forEach(node => {
+      // if (this.artboard.layers[node.id]?.el)
+      node.img.src = this.artboard.layers[node.id].el.toDataURL()
     })
   },
   removeLayerNodes() {
-    if (this?.artboard?.layerNodes.length) {
-      this.artboard.layerNodes.forEach(node => node && node.el.remove())
+    if (this?.artboard?.activeLayerNodes.length) {
+      this.artboard.activeLayerNodes.forEach(node => node.el.remove())
     }
   },
 }
@@ -193,18 +193,19 @@ const settings = {
   createSpriteSheet() {
     //* We need to remember current artboard because creating a new one switches it.
     const currentArtboard = elements.artboard
-    const checkedLayers = elements.artboard.layers.filter(
+    const checkedLayers = elements.artboard.activeLayers.filter(
       (w, i) =>
-        currentArtboard.layerNodes
-          .find(n => n && n.id === i)
+        currentArtboard.activeLayerNodes
+          .find(n => n.id === i)
           ?.el.querySelector('input[type="checkbox"]').checked
     )
+    console.log('check', checkedLayers)
     const { offsets, column } = this.calculateColumnAndOffset(checkedLayers)
     this.inputs.column.value = column
 
     this.createNewArtboard()
-    const { column: col, row } = currentArtboard.layers[0]
-    currentArtboard.layerNodes
+    const { column: col, row } = currentArtboard.activeLayers[0]
+    currentArtboard.activeLayerNodes
       .filter(w => w?.el.querySelector('input[type="checkbox"]').checked)
       .forEach((w, i) => {
         elements.artboard.drawboard.ctx.putImageData(
@@ -228,7 +229,6 @@ const settings = {
       m: this.d,
       'frame-no': checkedLayers.length,
     })
-    console.log(elements.artboard.drawboard.el.toDataURL())
   },
 }
 
