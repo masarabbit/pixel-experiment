@@ -1,17 +1,17 @@
-import { convertCameCase } from '../utils.js'
+import { convertCamelCase } from '../utils.js'
 import { settings, elements } from '../elements.js'
 
 class Input {
   constructor(props) {
-    const label = convertCameCase(props.inputName)
+    const label = convertCamelCase(props.inputName)
     const isColorInput = props.inputName.includes('color')
     Object.assign(this, {
       el: Object.assign(document.createElement('div'), {
         className: isColorInput ? 'color-input-wrap' : 'input-wrap',
         innerHTML: `
           <label class="${isColorInput ? 'color-label' : ''}" for="${
-          props.inputName
-        }">
+            props.inputName
+          }">
             ${isColorInput ? '' : label}
           </label>
           <input 

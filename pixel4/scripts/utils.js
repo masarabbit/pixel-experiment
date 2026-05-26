@@ -16,7 +16,7 @@ export const rgbToHex = (r, g, b) => {
 
 export const hex = rgb => '#' + ('000000' + rgb).slice(-6)
 
-export const convertCameCase = string => {
+export const convertCamelCase = string => {
   return string
     .split('')
     .map(letter => {
