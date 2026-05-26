@@ -84,7 +84,7 @@ canvas {
 .select-box {
   position: absolute;
   border: 1px solid hotpink;
-  z-index: 2;
+  z-index: 99;
   background-color: rgba(255, 105, 180, 0.432);
   pointer-events: all;
 }

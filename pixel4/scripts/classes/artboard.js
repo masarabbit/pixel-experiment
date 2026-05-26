@@ -20,6 +20,7 @@ class Canvas extends PageObject {
   resizeCanvas({ w, h } = {}) {
     if (w) this.w = w
     if (h) this.h = h
+    this.d = settings.d
     this.setStyles()
     this.el.setAttribute('width', this.w)
     this.el.setAttribute('height', this.h || this.w)
@@ -47,7 +48,7 @@ class Canvas extends PageObject {
   extractColors(data) {
     const dataToUpdate = data || settings.colors
     dataToUpdate.length = 0
-    const { d } = settings
+    const { d } = this
     const w = this.w / d
     const h = this.h / d
     const offset = Math.floor(d / 2)
@@ -299,18 +300,16 @@ class Artboard extends PageObject {
     if (this.draw) this.colorCell(e)
   }
   resize() {
-    const prev = {
-      w: this.w,
-      h: this.h,
-    }
     this.w = settings.column * settings.d
     this.h = settings.row * settings.d
     this.d = settings.d
     this.setStyles()
     this.activeLayers.forEach((layer, i) => {
       const img = this.activeLayerNodes.find(n => n.id === i).img
+      const colors = []
+      layer.extractColors(colors)
       layer.resizeCanvas(this.size)
-      layer.ctx.drawImage(img, 0, 0, prev.w, prev.h)
+      this.paintFromColors(colors, layer)
     })
     this.overlay.resizeCanvas(this.size)
     this.overlay.drawGrid()
@@ -321,16 +320,11 @@ class Artboard extends PageObject {
     this.drawboard.extractColors()
     settings.inputs.colors.value = settings.colors
   }
-  paintFromColors() {
+  paintFromColors(colors = settings.colors, canvas = this.drawboard) {
     const { d } = settings
-    settings.colors.forEach((c, i) => {
-      this.drawboard.ctx.fillStyle = c || 'transparent'
-      this.drawboard.ctx.fillRect(
-        settings.calcX(i) * d,
-        settings.calcY(i) * d,
-        d,
-        d
-      )
+    colors.forEach((c, i) => {
+      canvas.ctx.fillStyle = c || 'transparent'
+      canvas.ctx.fillRect(settings.calcX(i) * d, settings.calcY(i) * d, d, d)
     })
   }
   paintCanvas() {
