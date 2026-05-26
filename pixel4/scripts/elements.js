@@ -193,13 +193,12 @@ const settings = {
   createSpriteSheet() {
     //* We need to remember current artboard because creating a new one switches it.
     const currentArtboard = elements.artboard
-    const checkedLayers = elements.artboard.activeLayers.filter(
+    const checkedLayers = elements.artboard.layers.filter(
       (w, i) =>
         currentArtboard.activeLayerNodes
           .find(n => n.id === i)
           ?.el.querySelector('input[type="checkbox"]').checked
     )
-    console.log('check', checkedLayers)
     const { offsets, column } = this.calculateColumnAndOffset(checkedLayers)
     this.inputs.column.value = column
 

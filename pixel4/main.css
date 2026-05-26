@@ -498,7 +498,8 @@ textarea {
   background-color: #fff;
   --frame-no: 2;
   background-size: calc(var(--width) * var(--frame-no)) var(--height);
-  animation: frame-animation infinite 0.5s steps(var(--frame-no));
+  animation: frame-animation infinite calc(0.2s * var(--frame-no))
+    steps(var(--frame-no));
   image-rendering: pixelated;
 }
 
