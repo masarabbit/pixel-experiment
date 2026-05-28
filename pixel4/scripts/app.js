@@ -1,7 +1,7 @@
 import { Input, SizeInput, TextArea, Upload } from './classes/input.js'
 import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
-import { settings, elements } from './elements.js'
+import { editor, elements } from './elements.js'
 import PageObject from './classes/pageObject.js'
 import { LayerNode } from './classes/layer.js'
 
@@ -26,14 +26,14 @@ window.addEventListener('DOMContentLoaded', () => {
           container: nav.contentWrapper,
           className: 'colors',
           action: e => {
-            settings.colors = e.target.value.split(',')
+            editor.colors = e.target.value.split(',')
             elements.artboard.paintCanvas()
           },
           buttons: [
             {
               className: 'icon generate',
               action: textArea => {
-                settings.colors = textArea.value
+                editor.colors = textArea.value
                 elements.artboard.paintCanvas()
               },
             },
@@ -93,7 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
           },
           {
             btnText: 'create sprite',
-            action: () => settings.createSpriteSheet(),
+            action: () => editor.createSpriteSheet(),
           },
         ])
 
@@ -106,7 +106,7 @@ window.addEventListener('DOMContentLoaded', () => {
         nav.contentWrapper.append(elements.layersUi.el)
       },
     }),
-    artboard: settings.createNewArtboard(),
+    artboard: editor.createNewArtboard(),
     main: new NavWindow({
       name: 'main',
       container: elements.body,
@@ -127,7 +127,7 @@ window.addEventListener('DOMContentLoaded', () => {
           const inputClass = ['column', 'row'].includes(inputName)
             ? SizeInput
             : Input
-          settings.inputs[inputName] = new inputClass({
+          editor.inputs[inputName] = new inputClass({
             inputName,
             container: nav.contentWrapper,
             isNum,
@@ -141,8 +141,8 @@ window.addEventListener('DOMContentLoaded', () => {
           {
             btnText: 'swapColor',
             action: () => {
-              settings.inputs.colors.value = settings.colors.map(c => {
-                return c === settings.hex ? settings.hex2 : c
+              editor.inputs.colors.value = editor.colors.map(c => {
+                return c === editor.hex ? editor.hex2 : c
               })
               elements.artboard.paintCanvas()
             },
@@ -157,7 +157,7 @@ window.addEventListener('DOMContentLoaded', () => {
       y: 100,
       isOpen: false,
       content: nav => {
-        settings.inputs.filename = new Input({
+        editor.inputs.filename = new Input({
           inputName: 'filename',
           container: nav.contentWrapper,
         })
@@ -176,23 +176,23 @@ window.addEventListener('DOMContentLoaded', () => {
             action: () => {
               elements.artboard.dataUrl =
                 elements.artboard.drawboard.el.toDataURL()
-              settings.inputs.dataUrl.value = elements.artboard.dataUrl
+              editor.inputs.dataUrl.value = elements.artboard.dataUrl
             },
           },
           {
             className: 'output-data-url-from-one-pixel-image',
             action: () => {
               // could be refactored to partially reuse this codeblock
-              const currentCellSize = settings.cellSize
-              settings.inputs.cellSize.value = 1
+              const currentCellSize = editor.cellSize
+              editor.inputs.cellSize.value = 1
               elements.artboard.resizeAndPaintCanvas()
 
               elements.artboard.dataUrl =
                 elements.artboard.drawboard.el.toDataURL()
-              settings.inputs.dataUrl.value = elements.artboard.dataUrl
+              editor.inputs.dataUrl.value = elements.artboard.dataUrl
 
               setTimeout(() => {
-                settings.inputs.cellSize.value = currentCellSize
+                editor.inputs.cellSize.value = currentCellSize
                 elements.artboard.resizeAndPaintCanvas()
               }, 500)
             },
@@ -205,7 +205,7 @@ window.addEventListener('DOMContentLoaded', () => {
           },
           {
             btnText: 'split',
-            action: () => settings.splitSpriteSheet(),
+            action: () => editor.splitSpriteSheet(),
           },
         ])
       },
@@ -281,14 +281,14 @@ window.addEventListener('DOMContentLoaded', () => {
         nav.addButtons([
           {
             className: 'undo',
-            action: () => settings.undo(),
+            action: () => editor.undo(),
           },
           {
             className: 'fill',
             shortCut: 'f',
             action: b => {
               b.el.classList.toggle('active')
-              settings.fill = !settings.fill
+              editor.fill = !editor.fill
             },
           },
           {
@@ -296,7 +296,7 @@ window.addEventListener('DOMContentLoaded', () => {
             shortCut: 'e',
             action: b => {
               b.el.classList.toggle('active')
-              settings.erase = !settings.erase
+              editor.erase = !editor.erase
             },
           },
           {
@@ -310,9 +310,9 @@ window.addEventListener('DOMContentLoaded', () => {
           {
             className: 'grid-display',
             action: () => {
-              settings.shouldShowGrid = !settings.shouldShowGrid
+              editor.shouldShowGrid = !editor.shouldShowGrid
               elements.artboard.overlay[
-                settings.shouldShowGrid ? 'drawGrid' : 'clearGrid'
+                editor.shouldShowGrid ? 'drawGrid' : 'clearGrid'
               ]()
             },
           },
@@ -329,7 +329,7 @@ window.addEventListener('DOMContentLoaded', () => {
             shortCut: 'p',
             action: b => {
               b.el.classList.toggle('active')
-              settings.colorPick = !settings.colorPick
+              editor.colorPick = !editor.colorPick
             },
           },
         ]),
@@ -344,7 +344,7 @@ window.addEventListener('DOMContentLoaded', () => {
         nav.addButtons([
           {
             btnText: 'new board',
-            action: settings.createNewArtboard,
+            action: editor.createNewArtboard,
           },
           {
             btnText: 'show elements',
@@ -355,12 +355,12 @@ window.addEventListener('DOMContentLoaded', () => {
           {
             btnText: 'show setting',
             action: () => {
-              console.log('settings', settings)
+              console.log('editor', editor)
             },
           },
           {
             btnText: 'combine',
-            action: () => settings.combineArtboards(),
+            action: () => editor.combineArtboards(),
           },
         ]),
     }),
@@ -380,7 +380,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('button').forEach(b => {
     // TODO ref can be used to create a list of shortCut
     if (b.dataset.shortCut)
-      settings.shortCuts[b.dataset.shortCut] = {
+      editor.shortCuts[b.dataset.shortCut] = {
         button: b,
         ref: b.classList[1],
       }
@@ -424,7 +424,7 @@ window.addEventListener('DOMContentLoaded', () => {
       ]('d-none')
     }
 
-    settings.recordState()
+    editor.recordState()
     elements.updateLayersUi()
     elements.saveData()
   })
@@ -445,10 +445,10 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   window.addEventListener('keyup', e => {
-    const b = settings.shortCuts[e.key.toLowerCase()]
+    const b = editor.shortCuts[e.key.toLowerCase()]
     if (b) b.button.click()
   })
 
   elements.readData()
-  settings.recordState()
+  editor.recordState()
 })

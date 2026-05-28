@@ -1,5 +1,5 @@
 import { px, nearestN } from '../utils.js'
-import { settings, elements } from '../elements.js'
+import { editor, elements } from '../elements.js'
 
 class PageObject {
   constructor(props) {
@@ -28,10 +28,10 @@ class PageObject {
     }
   }
   get column() {
-    return this.w / settings.d
+    return this.w / editor.d
   }
   get row() {
-    return this.h / settings.d
+    return this.h / editor.d
   }
   get cellSize() {
     return this.d
@@ -54,8 +54,8 @@ class PageObject {
   }
   touchPos(x, y) {
     return {
-      x: nearestN(x, settings.d),
-      y: nearestN(y, settings.d),
+      x: nearestN(x, editor.d),
+      y: nearestN(y, editor.d),
     }
   }
   addDragEvent() {

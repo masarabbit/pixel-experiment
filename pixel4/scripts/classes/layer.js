@@ -37,7 +37,7 @@ export class LayerNode extends PageObject {
     this.setStyles()
   }
   touchPos(x, y) {
-    //* setting as is so it doesn't lock to settings.d
+    //* setting as is so it doesn't lock to editor.d
     return {
       x,
       y,

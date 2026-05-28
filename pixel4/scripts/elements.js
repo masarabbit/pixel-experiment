@@ -16,7 +16,7 @@ const elements = {
       const { x, y, isOpen } = this.windows[key]
       obj[key] = { x, y, isOpen }
     })
-    const { column, row, cellSize } = settings
+    const { column, row, cellSize } = editor
     localStorage.setItem(
       this.saveDataName,
       JSON.stringify({ ...obj, column, row, cellSize })
@@ -29,7 +29,7 @@ const elements = {
 
       Object.keys(data).forEach(key => {
         if (['column', 'row', 'cellSize'].includes(key)) {
-          settings.inputs[key].value = data[key]
+          editor.inputs[key].value = data[key]
         } else {
           ;['x', 'y', 'isOpen'].forEach(prop => {
             this.windows[key][prop] = data[key][prop]
@@ -37,9 +37,9 @@ const elements = {
           this.windows[key].setUp()
         }
       })
-      settings.inputs.colors.value = new Array(
-        settings.column * settings.row
-      ).fill('transparent')
+      editor.inputs.colors.value = new Array(editor.column * editor.row).fill(
+        'transparent'
+      )
       this.artboard.resize()
     }
   },
@@ -56,7 +56,7 @@ const elements = {
   },
 }
 
-const settings = {
+const editor = {
   column: 16,
   row: 16,
   cellSize: 20,
@@ -137,9 +137,9 @@ const settings = {
       content: nav => {
         nav.artboard = new Artboard({
           container: nav.contentWrapper,
-          w: settings.column * settings.d,
-          h: settings.row * settings.d,
-          d: settings.d,
+          w: editor.column * editor.d,
+          h: editor.row * editor.d,
+          d: editor.d,
         })
         elements.artboardWindows.push(nav)
       },
@@ -267,4 +267,4 @@ const settings = {
   },
 }
 
-export { elements, settings }
+export { elements, editor }

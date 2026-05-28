@@ -1,8 +1,8 @@
-import { settings, elements } from '../elements.js'
+import { editor, elements } from '../elements.js'
 
 class TraceSvg {
   constructor(props) {
-    const { column } = settings
+    const { column } = editor
     Object.assign(this, {
       pathData: [],
       column,
@@ -16,13 +16,13 @@ class TraceSvg {
       arr: [],
       cI: null,
       proceed: null,
-      colors: settings.colors,
+      colors: editor.colors,
       ...props,
     })
     this.convertToSvg(this.colors)
     const gap = ' '
     // const gap = ''
-    settings.inputs.dataUrl.value = this.pathData
+    editor.inputs.dataUrl.value = this.pathData
       .map(p => {
         return `<path fill="${p.color}" d="${p.path.join(gap)}" ${
           p.isEvenOdd ? 'fill-rule="evenodd"' : ''

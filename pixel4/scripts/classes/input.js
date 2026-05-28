@@ -1,5 +1,5 @@
 import { convertCamelCase } from '../utils.js'
-import { settings, elements } from '../elements.js'
+import { editor, elements } from '../elements.js'
 
 class Input {
   constructor(props) {
@@ -27,12 +27,12 @@ class Input {
     props.container.appendChild(this.el)
     this.input = this.el.querySelector('input')
     this.addChangeListener()
-    if (this.default) settings[this.inputName] = this.default
+    if (this.default) editor[this.inputName] = this.default
     if (isColorInput) {
       this.label = this.el.querySelector('label')
       this.updateColor()
     } else {
-      this.input.value = settings[props.inputName]
+      this.input.value = editor[props.inputName]
     }
   }
   get key() {
@@ -44,25 +44,24 @@ class Input {
   set value(val) {
     const v = this.isNum ? +val : val
     this.input.value = v
-    settings[this.inputName] = v
+    editor[this.inputName] = v
   }
   updateColor() {
     const label =
-      this.label ||
-      settings.inputs[this.inputName.replace('hex', 'color')].label
-    label.style.backgroundColor = settings[this.key]
-    if (settings?.inputs[this.key])
-      settings.inputs[this.key].value = settings[this.key]
+      this.label || editor.inputs[this.inputName.replace('hex', 'color')].label
+    label.style.backgroundColor = editor[this.key]
+    if (editor?.inputs[this.key])
+      editor.inputs[this.key].value = editor[this.key]
   }
   updateColorInputs(color) {
-    settings.color = color
-    settings.inputs.hex.value = color
-    settings.inputs.color.value = color
-    settings.inputs.color.label.style.backgroundColor = color
+    editor.color = color
+    editor.inputs.hex.value = color
+    editor.inputs.color.value = color
+    editor.inputs.color.label.style.backgroundColor = color
   }
   addChangeListener() {
     this.input.addEventListener('change', e => {
-      settings[this.key] = e.target.value
+      editor[this.key] = e.target.value
       if (['color', 'color2', 'hex', 'hex2'].includes(this.inputName))
         this.updateColor()
       if (this.update) this.update()
@@ -74,22 +73,22 @@ class SizeInput extends Input {
   addChangeListener() {
     this.input.addEventListener('change', e => {
       this.resizeColors()
-      settings[this.key] = +e.target.value
+      editor[this.key] = +e.target.value
       if (this.update) this.update()
     })
   }
   resizeColors = () => {
-    const newArr = settings.splitColors
-    newArr.length = settings.inputs.row.value
-    settings.inputs.colors.value = newArr
+    const newArr = editor.splitColors
+    newArr.length = editor.inputs.row.value
+    editor.inputs.colors.value = newArr
       .map(arr => {
         const arrCopy = arr
-        arrCopy.length = settings.inputs.column.value
-        arrCopy.fill('transparent', settings.column)
+        arrCopy.length = editor.inputs.column.value
+        arrCopy.fill('transparent', editor.column)
         return arrCopy
       })
       .flat(1)
-    settings.colors = settings.inputs.colors.value
+    editor.colors = editor.inputs.colors.value
   }
 }
 
@@ -118,14 +117,14 @@ class TextArea {
         action: () => b.action(this),
       })
     })
-    settings.inputs[this.inputName] = this
+    editor.inputs[this.inputName] = this
   }
   get value() {
     return this.input.value.split(',')
   }
   set value(val) {
     this.input.value = val
-    settings[this.inputName] = Array.isArray(val) ? val : val.split(',')
+    editor[this.inputName] = Array.isArray(val) ? val : val.split(',')
   }
   async copyText() {
     try {

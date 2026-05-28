@@ -1,6 +1,6 @@
 import { nearestN, rgbToHex, hex } from '../utils.js'
 import PageObject from './pageObject.js'
-import { elements, settings } from '../elements.js'
+import { elements, editor } from '../elements.js'
 import { LayerNode } from './layer.js'
 
 class Canvas extends PageObject {
@@ -20,14 +20,14 @@ class Canvas extends PageObject {
   resizeCanvas({ w, h } = {}) {
     if (w) this.w = w
     if (h) this.h = h
-    this.d = settings.d
+    this.d = editor.d
     this.setStyles()
     this.el.setAttribute('width', this.w)
     this.el.setAttribute('height', this.h || this.w)
   }
   drawGrid() {
     const { ctx } = this
-    const { column, row, d, gridWidth } = settings
+    const { column, row, d, gridWidth } = editor
     ctx.strokeStyle = this.artboard.gridColor
     ctx.beginPath()
     const pos = (n, max) => n * d + (n === max ? -gridWidth : gridWidth)
@@ -46,7 +46,7 @@ class Canvas extends PageObject {
     this.ctx.clearRect(0, 0, this.w, this.h)
   }
   extractColors(data) {
-    const dataToUpdate = data || settings.colors
+    const dataToUpdate = data || editor.colors
     dataToUpdate.length = 0
     const { d } = this
     const w = this.w / d
@@ -106,13 +106,13 @@ class SelectBox extends Canvas {
     const { x, y, w, h } = this
     elements.artboard.drawboard.ctx.clearRect(x, y, w, h)
     elements.artboard.drawboard.extractColors()
-    settings.inputs.colors.value = settings.colors
+    editor.inputs.colors.value = editor.colors
   }
   crop() {
     this.copy()
-    settings.inputs.column.value = this.column
-    settings.inputs.row.value = this.h / settings.d
-    settings.inputs.colors.value = this.copyData
+    editor.inputs.column.value = this.column
+    editor.inputs.row.value = this.h / editor.d
+    editor.inputs.colors.value = this.copyData
     ;['resize', 'paintCanvas', 'toggleSelectState'].forEach(action =>
       elements.artboard[action]()
     )
@@ -122,7 +122,7 @@ class SelectBox extends Canvas {
     img.onload = () => {
       elements.artboard.drawboard.ctx.drawImage(img, this.x, this.y)
       elements.artboard.drawboard.extractColors()
-      settings.inputs.colors.value = settings.colors
+      editor.inputs.colors.value = editor.colors
     }
     img.src = this.el.toDataURL()
   }
@@ -134,14 +134,14 @@ class SelectBox extends Canvas {
     }, [])
   }
   paintFromColors() {
-    const { d } = settings
+    const { d } = editor
     this.copyData.forEach((c, i) => {
       this.ctx.fillStyle = c || 'transparent'
       this.ctx.fillRect(this.calcX(i) * d, this.calcY(i) * d, d, d)
     })
   }
   paintCanvas() {
-    const { column, row, d } = settings
+    const { column, row, d } = editor
     this.ctx.clearRect(0, 0, column * d, row * d)
     this.paintFromColors()
     // populatePalette(artData.colors)
@@ -235,7 +235,7 @@ class Artboard extends PageObject {
   }
   createSelectBox(e) {
     if (this.selectBox) this.selectBox.el.remove()
-    const { d } = settings
+    const { d } = editor
     const { x, y } = this.drawPos(e)
     this.selectBox = new SelectBox({
       container: this.el,
@@ -262,20 +262,20 @@ class Artboard extends PageObject {
   drawPos = e => {
     const { top, left } = elements.artboard.el.getBoundingClientRect()
     return {
-      x: nearestN(e.pageX - left - window.scrollX, settings.d),
-      y: nearestN(e.pageY - top - window.scrollY, settings.d),
+      x: nearestN(e.pageX - left - window.scrollX, editor.d),
+      y: nearestN(e.pageY - top - window.scrollY, editor.d),
     }
   }
   colorCell = e => {
     const { x, y } = this.drawPos(e)
-    const { column, d, colorPick } = settings
+    const { column, d, colorPick } = editor
     const index = (y / d - 1) * column + x / d - 1
 
     if (colorPick) {
-      settings.inputs.color.updateColorInputs(settings.colors[index])
+      editor.inputs.color.updateColorInputs(editor.colors[index])
     } else {
-      this.drawboard.ctx.fillStyle = settings.hex
-      this.drawboard.ctx[settings.erase ? 'clearRect' : 'fillRect'](
+      this.drawboard.ctx.fillStyle = editor.hex
+      this.drawboard.ctx[editor.erase ? 'clearRect' : 'fillRect'](
         x - d,
         y - d,
         d,
@@ -283,12 +283,12 @@ class Artboard extends PageObject {
       )
 
       const value =
-        settings.erase || settings.hex === 'transparent'
+        editor.erase || editor.hex === 'transparent'
           ? 'transparent'
-          : settings.hex // transparent replaced with ''
+          : editor.hex // transparent replaced with ''
 
-      settings.fill ? this.fillBucket(index) : (settings.colors[index] = value)
-      settings.inputs.colors.value = settings.colors
+      editor.fill ? this.fillBucket(index) : (editor.colors[index] = value)
+      editor.inputs.colors.value = editor.colors
 
       // if (!artData.palette.includes(value)) {
       //   artData.palette.push(value)
@@ -300,9 +300,9 @@ class Artboard extends PageObject {
     if (this.draw) this.colorCell(e)
   }
   resize() {
-    this.w = settings.column * settings.d
-    this.h = settings.row * settings.d
-    this.d = settings.d
+    this.w = editor.column * editor.d
+    this.h = editor.row * editor.d
+    this.d = editor.d
     this.setStyles()
     this.activeLayers.forEach((layer, i) => {
       const img = this.activeLayerNodes.find(n => n.id === i).img
@@ -318,17 +318,17 @@ class Artboard extends PageObject {
     // ;['resize', 'paintCanvas'].forEach(action => this[action]())
     this.resize()
     this.drawboard.extractColors()
-    settings.inputs.colors.value = settings.colors
+    editor.inputs.colors.value = editor.colors
   }
-  paintFromColors(colors = settings.colors, canvas = this.drawboard) {
-    const { d } = settings
+  paintFromColors(colors = editor.colors, canvas = this.drawboard) {
+    const { d } = editor
     colors.forEach((c, i) => {
       canvas.ctx.fillStyle = c || 'transparent'
-      canvas.ctx.fillRect(settings.calcX(i) * d, settings.calcY(i) * d, d, d)
+      canvas.ctx.fillRect(editor.calcX(i) * d, editor.calcY(i) * d, d, d)
     })
   }
   paintCanvas() {
-    const { column, row, d } = settings
+    const { column, row, d } = editor
     this.drawboard.ctx.clearRect(0, 0, column * d, row * d)
     this.paintFromColors()
     // populatePalette(artData.colors)
@@ -341,7 +341,7 @@ class Artboard extends PageObject {
     this.output(this.dataUrl)
   }
   output(dataUrl, chainedAction) {
-    const { column, row, d } = settings
+    const { column, row, d } = editor
     const img = new Image()
     img.onload = () => {
       const { naturalWidth: w, naturalHeight: h } = img
@@ -356,7 +356,7 @@ class Artboard extends PageObject {
       this.drawboard.resizeCanvas({ w: column * d, h: row * d })
       this.paintCanvas()
       this.drawboard.extractColors()
-      settings.inputs.colors.value = settings.colors
+      editor.inputs.colors.value = editor.colors
       if (chainedAction)
         chainedAction({
           canvas: this.drawboard.el,
@@ -370,7 +370,7 @@ class Artboard extends PageObject {
   downloadImage = () => {
     const link = document.createElement('a')
     link.download = `${
-      settings.inputs.filename.value || 'art'
+      editor.inputs.filename.value || 'art'
     }_${new Date().getTime()}.png`
     link.href = this.drawboard.el.toDataURL()
     link.click()
@@ -378,7 +378,7 @@ class Artboard extends PageObject {
   fillArea = ({ i, valueToCheck, colors }) => {
     const fillArea = []
     const fillStack = []
-    const { column: w } = settings
+    const { column: w } = editor
     fillStack.push(i) // first cell to fill
 
     while (fillStack.length > 0) {
@@ -394,15 +394,15 @@ class Artboard extends PageObject {
     return fillArea
   }
   fillBucket = index => {
-    if (index < 0 || index >= settings.colors.length) return
-    const fillValue = settings.erase ? 'transparent' : settings.hex //! '' instead of transparent
-    const valueToSwap = settings.colors[index]
+    if (index < 0 || index >= editor.colors.length) return
+    const fillValue = editor.erase ? 'transparent' : editor.hex //! '' instead of transparent
+    const valueToSwap = editor.colors[index]
     const fillAreaBucket = this.fillArea({
       i: +index,
       valueToCheck: valueToSwap,
-      colors: settings.colors,
+      colors: editor.colors,
     })
-    settings.inputs.colors.value = settings.inputs.colors.value
+    editor.inputs.colors.value = editor.inputs.colors.value
       .map((c, i) => {
         if (!fillAreaBucket.includes(i)) return c
         return c === valueToSwap ? fillValue : c
@@ -411,20 +411,20 @@ class Artboard extends PageObject {
     this.paintCanvas()
   }
   refresh() {
-    settings.inputs.colors.value = Array(settings.row * settings.column).fill(
+    editor.inputs.colors.value = Array(editor.row * editor.column).fill(
       'transparent'
     )
   }
   flipHorizontal() {
     this.drawboard.extractColors()
-    settings.inputs.colors.value = settings.splitColors
+    editor.inputs.colors.value = editor.splitColors
       .map(a => a.reverse())
       .flat(1)
     this.paintCanvas()
   }
   flipVertical() {
     this.drawboard.extractColors()
-    settings.inputs.colors.value = settings.splitColors.reverse().flat(1)
+    editor.inputs.colors.value = editor.splitColors.reverse().flat(1)
     this.paintCanvas()
   }
   switchArtboard = () => {
@@ -458,9 +458,9 @@ class Artboard extends PageObject {
       w.window.classList[w.artboard === this ? 'add' : 'remove']('current')
     })
     elements.artboard.drawboard.extractColors()
-    settings.inputs.colors.value = settings.colors
+    editor.inputs.colors.value = editor.colors
     ;['column', 'row'].forEach(prop => {
-      settings.inputs[prop].value = elements.artboard[prop]
+      editor.inputs[prop].value = elements.artboard[prop]
     })
   }
   deleteLayerNode(i) {
