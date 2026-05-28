@@ -64,7 +64,7 @@ window.addEventListener('DOMContentLoaded', () => {
               className: 'icon output-from-data-url',
               action: () => {
                 if (elements.artboard?.dataUrl?.[0] === 'd') {
-                  elements.artboard.output()
+                  elements.artboard.output(elements.artboard.dataUrl)
                 }
               },
             },
@@ -202,6 +202,10 @@ window.addEventListener('DOMContentLoaded', () => {
             action: () => {
               new TraceSvg()
             },
+          },
+          {
+            btnText: 'split',
+            action: () => settings.splitSpriteSheet(),
           },
         ])
       },

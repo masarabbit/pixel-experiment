@@ -338,9 +338,9 @@ class Artboard extends PageObject {
   outputFromImage = () => {
     if (!this.uploadedFile) return
     this.dataUrl = window.URL.createObjectURL(this.uploadedFile)
-    this.output()
+    this.output(this.dataUrl)
   }
-  output() {
+  output(dataUrl, chainedAction) {
     const { column, row, d } = settings
     const img = new Image()
     img.onload = () => {
@@ -357,9 +357,15 @@ class Artboard extends PageObject {
       this.paintCanvas()
       this.drawboard.extractColors()
       settings.inputs.colors.value = settings.colors
+      if (chainedAction)
+        chainedAction({
+          canvas: this.drawboard.el,
+          calcWidth,
+          calcHeight,
+        })
       // populateCompletePalette(artData.colors)
     }
-    img.src = this.dataUrl
+    img.src = dataUrl
   }
   downloadImage = () => {
     const link = document.createElement('a')

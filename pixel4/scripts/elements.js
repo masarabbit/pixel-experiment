@@ -229,6 +229,42 @@ const settings = {
       'frame-no': checkedLayers.length,
     })
   },
+  splitSpriteSheet() {
+    // TODO these should be derived from somewhere
+    const col = 5
+    const row = 1
+    if (elements.artboard.uploadedFile) {
+      elements.artboard.output(
+        window.URL.createObjectURL(elements.artboard.uploadedFile),
+        ({ canvas, calcWidth, calcHeight }) => {
+          const w = calcWidth / col
+          const h = calcHeight / row
+          this.inputs.column.value = w / this.d
+          this.inputs.row.value = h / this.d
+          this.createNewArtboard()
+
+          const frameNo = col * row - 1
+
+          new Array(col * row).fill('').forEach((frame, i) => {
+            const x = ((frameNo - i) % col) * w
+            const y = Math.floor((frameNo - i) / col) * h
+            elements.artboard.drawboard.ctx.drawImage(
+              canvas,
+              x,
+              y,
+              w,
+              h,
+              0,
+              0,
+              w,
+              h
+            )
+            if (i < frameNo) elements.artboard.addLayer()
+          })
+        }
+      )
+    }
+  },
 }
 
 export { elements, settings }
