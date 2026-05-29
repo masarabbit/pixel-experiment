@@ -1,25 +1,26 @@
 import { convertCamelCase } from '../utils.js'
 import { editor, elements } from '../elements.js'
 
-class Input {
-  constructor(props) {
-    const label = convertCamelCase(props.inputName)
-    const isColorInput = props.inputName.includes('color')
-    Object.assign(this, {
-      el: Object.assign(document.createElement('div'), {
-        className: isColorInput ? 'color-input-wrap' : 'input-wrap',
-        innerHTML: `
-          <label class="${isColorInput ? 'color-label' : ''}" for="${
-            props.inputName
-          }">
-            ${isColorInput ? '' : label}
-          </label>
-          <input 
+const renderInput = (props, type) => {
+  return `<input 
             id="${props.inputName}" 
             class="${props?.className || ''} ${props.inputName}" 
-            type="${isColorInput ? 'color' : 'text'}" 
-            placeholder="${label}"
-          >
+            type="${type}" 
+            placeholder="${convertCamelCase(props.inputName)}"
+          ></input>`
+}
+
+// TODO separate out normal input and colorinput, and possibly other inputs
+export class Input {
+  constructor(props) {
+    Object.assign(this, {
+      el: Object.assign(document.createElement('div'), {
+        className: 'input-wrap',
+        innerHTML: `
+          <label for="${props.inputName}">
+            ${convertCamelCase(props.inputName)}
+          </label>
+         ${renderInput(props, 'text')}
         `,
       }),
       ...props,
@@ -28,15 +29,10 @@ class Input {
     this.input = this.el.querySelector('input')
     this.addChangeListener()
     if (this.default) editor[this.inputName] = this.default
-    if (isColorInput) {
-      this.label = this.el.querySelector('label')
-      this.updateColor()
-    } else {
-      this.input.value = editor[props.inputName]
-    }
+    this.input.value = editor[props.inputName]
   }
   get key() {
-    return this.inputName.replace('color', 'hex')
+    return this.inputName
   }
   get value() {
     return this.isNum ? +this.input.value : this.input.value
@@ -47,38 +43,72 @@ class Input {
     editor[this.inputName] = v
   }
   updateColor() {
-    const label =
-      this.label || editor.inputs[this.inputName.replace('hex', 'color')].label
+    const label = editor.inputs[this.inputName.replace('hex', 'color')].label
     label.style.backgroundColor = editor[this.key]
     if (editor?.inputs[this.key])
       editor.inputs[this.key].value = editor[this.key]
   }
-  updateColorInputs(color) {
-    editor.color = color
-    editor.inputs.hex.value = color
-    editor.inputs.color.value = color
-    editor.inputs.color.label.style.backgroundColor = color
-  }
   addChangeListener() {
     this.input.addEventListener('change', e => {
       editor[this.key] = e.target.value
-      if (['color', 'color2', 'hex', 'hex2'].includes(this.inputName))
-        this.updateColor()
-      if (this.update) this.update()
+      if (this.inputName.includes('hex')) this.updateColor()
     })
   }
 }
 
-class SizeInput extends Input {
+export class ColorInput {
+  constructor(props) {
+    Object.assign(this, {
+      el: Object.assign(document.createElement('div'), {
+        className: 'color-input-wrap',
+        innerHTML: `
+          <label class="color-label" for="${props.inputName}">
+          </label>
+          ${renderInput(props, 'color')}
+        `,
+      }),
+      ...props,
+    })
+    props.container.appendChild(this.el)
+    this.input = this.el.querySelector('input')
+    this.label = this.el.querySelector('label')
+    this.addChangeListener()
+    if (this.default) editor[this.inputName] = this.default
+    this.updateColor()
+  }
+  get key() {
+    return this.inputName.replace('color', 'hex')
+  }
+  get value() {
+    return this.input.value
+  }
+  set value(val) {
+    this.input.value = val
+    editor[this.inputName] = val
+  }
+  updateColor() {
+    this.label.style.backgroundColor = editor[this.key]
+    if (editor?.inputs[this.key])
+      editor.inputs[this.key].value = editor[this.key]
+  }
+  addChangeListener() {
+    this.input.addEventListener('change', e => {
+      editor[this.key] = e.target.value
+      this.updateColor()
+    })
+  }
+}
+
+export class SizeInput extends Input {
   addChangeListener() {
     this.input.addEventListener('change', e => {
       this.resizeColors()
       editor[this.key] = +e.target.value
-      if (this.update) this.update()
+      elements.artboard.resizeAndPaintCanvas()
     })
   }
   resizeColors = () => {
-    const newArr = editor.splitColors
+    const newArr = editor.spriteColors
     newArr.length = editor.inputs.row.value
     editor.inputs.colors.value = newArr
       .map(arr => {
@@ -92,7 +122,7 @@ class SizeInput extends Input {
   }
 }
 
-class TextArea {
+export class TextArea {
   constructor(props) {
     Object.assign(this, {
       el: Object.assign(document.createElement('div'), {
@@ -136,7 +166,7 @@ class TextArea {
   }
 }
 
-class Upload {
+export class Upload {
   constructor(props) {
     Object.assign(this, {
       el: Object.assign(document.createElement('div'), {
@@ -170,7 +200,7 @@ class Upload {
   }
 }
 
-class Button {
+export class Button {
   constructor(props) {
     Object.assign(this, {
       el: Object.assign(document.createElement('button'), {
@@ -184,5 +214,3 @@ class Button {
     this.el.addEventListener('click', () => this.action(this))
   }
 }
-
-export { Input, SizeInput, TextArea, Button, Upload }

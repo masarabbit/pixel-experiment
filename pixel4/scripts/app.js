@@ -1,4 +1,10 @@
-import { Input, SizeInput, TextArea, Upload } from './classes/input.js'
+import {
+  Input,
+  SizeInput,
+  TextArea,
+  Upload,
+  ColorInput,
+} from './classes/input.js'
 import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { editor, elements } from './elements.js'
@@ -115,34 +121,21 @@ window.addEventListener('DOMContentLoaded', () => {
       y: 20,
       content: nav => {
         ;[
-          'column',
-          'row',
-          'cellSize',
-          'color',
-          'hex',
-          'color2',
-          'hex2',
-          // 'split-col',
-          // 'split-row',
-        ].forEach(inputName => {
-          const isNum = [
-            'column',
-            'row',
-            'cellSize',
-            // 'split-col',
-            // 'split-row',
-          ].includes(inputName)
-          const inputClass = ['column', 'row'].includes(inputName)
-            ? SizeInput
-            : Input
+          { inputName: 'column', isNum: true, inputClass: SizeInput },
+          { inputName: 'row', isNum: true, inputClass: SizeInput },
+          { inputName: 'cellSize', isNum: true, inputClass: SizeInput },
+          { inputName: 'color', inputClass: ColorInput },
+          { inputName: 'hex', inputClass: Input },
+          { inputName: 'color2', inputClass: ColorInput },
+          { inputName: 'hex2', inputClass: Input },
+          { inputName: 'spriteCol', isNum: true, inputClass: Input },
+          { inputName: 'spriteRow', isNum: true, inputClass: Input },
+        ].forEach(({ inputName, isNum, inputClass }) => {
           editor.inputs[inputName] = new inputClass({
             inputName,
             container: nav.contentWrapper,
             isNum,
             className: isNum ? 'no' : '',
-            update: ['column', 'row'].includes(inputName)
-              ? () => elements.artboard.resizeAndPaintCanvas()
-              : null,
           })
         })
         nav.addButtons([
@@ -405,6 +398,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ) {
       if (window.confirm('are you sure?'))
         elements.artboard.deleteLayerNode(+e.target.dataset.id)
+    } else if (e.target.dataset.id) {
+      elements.artboard.layerNodes[+e.target.dataset.id].selectLayer()
     }
   })
 

@@ -10,7 +10,7 @@
 :root {
   --highlight: #78ddf7;
   --main: #78ddf7;
-  --select: #f7d778;
+  --select: #f54988;
   /* --main: #ff5900; */
   --page-width: 700px;
 }
@@ -20,7 +20,7 @@ body {
   padding: 0;
   font-family: sans-serif;
   color: #fff;
-  background-color: rgb(24, 24, 24);
+  background-color: #160537;
 }
 
 p,
@@ -402,6 +402,10 @@ textarea {
   background-color: var(--select);
 }
 
+.current img {
+  box-shadow: 0 0 0 2px var(--select);
+}
+
 .handle p {
   font-size: 8px;
   text-transform: uppercase;
@@ -412,7 +416,7 @@ textarea {
 .content-wrapper {
   height: calc(100% - var(--handle-h));
   width: 100%;
-  background-color: #2a2a2ad7;
+  background-color: #2e0d64d7;
   display: flex;
   flex-wrap: wrap;
 }

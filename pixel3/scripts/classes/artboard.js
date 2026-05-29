@@ -123,7 +123,7 @@ class SelectBox extends Canvas {
     }
     img.src = this.el.toDataURL()
   }
-  get splitColors() {
+  get spriteColors() {
     return this.copyData.reduce((acc, _, i) => {
       if (i % this.column === 0)
         acc.push(this.copyData.slice(i, i + this.column))
@@ -144,11 +144,11 @@ class SelectBox extends Canvas {
     // populatePalette(artData.colors)
   }
   flipHorizontal() {
-    this.copyData = this.splitColors.map(a => a.reverse()).flat(1)
+    this.copyData = this.spriteColors.map(a => a.reverse()).flat(1)
     this.paintCanvas()
   }
   flipVertical() {
-    this.copyData = this.splitColors.reverse().flat(1)
+    this.copyData = this.spriteColors.reverse().flat(1)
     this.paintCanvas()
   }
 }
@@ -268,9 +268,9 @@ class Artboard extends PageObject {
     if (this.draw) this.colorCell(e)
   }
   resize() {
-    ;(this.w = settings.column * settings.d),
+    ;((this.w = settings.column * settings.d),
       (this.h = settings.row * settings.d),
-      (this.d = settings.d)
+      (this.d = settings.d))
     this.setStyles()
     this.drawboard.resizeCanvas(this.size)
     this.overlay.resizeCanvas(this.size)
@@ -372,13 +372,13 @@ class Artboard extends PageObject {
     )
   }
   flipHorizontal() {
-    settings.inputs.colors.value = settings.splitColors
+    settings.inputs.colors.value = settings.spriteColors
       .map(a => a.reverse())
       .flat(1)
     this.paintCanvas()
   }
   flipVertical() {
-    settings.inputs.colors.value = settings.splitColors.reverse().flat(1)
+    settings.inputs.colors.value = settings.spriteColors.reverse().flat(1)
     this.paintCanvas()
   }
   switchArtboard = () => {

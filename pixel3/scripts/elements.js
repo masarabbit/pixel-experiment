@@ -72,7 +72,7 @@ const settings = {
   set d(val) {
     this.cellSize = val
   },
-  get splitColors() {
+  get spriteColors() {
     return this.colors.reduce((acc, _, i) => {
       if (i % this.column === 0) acc.push(this.colors.slice(i, i + this.column))
       return acc

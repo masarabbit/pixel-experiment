@@ -11,15 +11,15 @@ const elements = {
   windows: {},
   saveDataName: 'window-pos',
   saveData() {
-    const obj = {}
-    Object.keys(this.windows).forEach(key => {
+    const obj = Object.keys(this.windows).reduce((acc, key) => {
       const { x, y, isOpen } = this.windows[key]
-      obj[key] = { x, y, isOpen }
-    })
-    const { column, row, cellSize } = editor
+      acc[key] = { x, y, isOpen }
+      return acc
+    }, {})
+    const { column, row, cellSize, spriteCol, spriteRow } = editor
     localStorage.setItem(
       this.saveDataName,
-      JSON.stringify({ ...obj, column, row, cellSize })
+      JSON.stringify({ ...obj, column, row, cellSize, spriteCol, spriteRow })
     )
   },
   readData() {
@@ -28,7 +28,9 @@ const elements = {
       const data = JSON.parse(saveData)
 
       Object.keys(data).forEach(key => {
-        if (['column', 'row', 'cellSize'].includes(key)) {
+        if (
+          ['column', 'row', 'cellSize', 'spriteRow', 'spriteCol'].includes(key)
+        ) {
           editor.inputs[key].value = data[key]
         } else {
           ;['x', 'y', 'isOpen'].forEach(prop => {
@@ -62,8 +64,8 @@ const editor = {
   cellSize: 20,
   hex: '#000000',
   hex2: null,
-  // splitRow: 0,
-  // splitCol: 0,
+  spriteRow: 0,
+  spriteCol: 0,
   filename: 'pixel-4',
   shouldShowGrid: true,
   gridWidth: 0.5,
@@ -88,7 +90,7 @@ const editor = {
   set d(val) {
     this.cellSize = val
   },
-  get splitColors() {
+  get spriteColors() {
     return this.colors.reduce((acc, _, i) => {
       if (i % this.column === 0) acc.push(this.colors.slice(i, i + this.column))
       return acc
@@ -232,17 +234,15 @@ const editor = {
     })
   },
   splitSpriteSheet() {
-    // TODO these should be derived from somewhere
-    const col = 3
-    const row = 4
+    const { spriteRow: row, spriteCol: col, d } = editor
     if (elements.artboard.uploadedFile) {
       elements.artboard.output(
         window.URL.createObjectURL(elements.artboard.uploadedFile),
         ({ canvas, calcWidth, calcHeight }) => {
           const w = calcWidth / col
           const h = calcHeight / row
-          this.inputs.column.value = w / this.d
-          this.inputs.row.value = h / this.d
+          this.inputs.column.value = w / d
+          this.inputs.row.value = h / d
           this.createNewArtboard()
 
           const frameNo = col * row - 1
@@ -266,6 +266,12 @@ const editor = {
         }
       )
     }
+  },
+  updateColorInputs(color) {
+    this.color = color
+    this.inputs.hex.value = color
+    this.inputs.color.value = color
+    this.inputs.color.label.style.backgroundColor = color
   },
 }
 

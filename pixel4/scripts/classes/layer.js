@@ -26,12 +26,14 @@ export class LayerNode extends PageObject {
       n.y += this.defH
       n.setStyles()
     })
+    this.el.setAttribute('data-id', this.id)
     elements.layersUi.el.append(this.el)
     this.artboard.layerNodes.push(this)
-    const z = this.artboard.layerNodes.length
-    this.el.style.zIndex = z
-    this.artboard.layers[this.id].el.style.zIndex = z
-    if (this.artboard.overlay) this.artboard.overlay.el.style.zIndex = z + 1
+    this.selectLayer()
+    if (this.artboard.overlay)
+      this.artboard.overlay.el.style.zIndex =
+        this.artboard.layerNodes.length + 1
+
     this.img.src = this.artboard.layers[this.id].el.toDataURL()
     this.addDragEvent()
     this.setStyles()
@@ -43,15 +45,24 @@ export class LayerNode extends PageObject {
       y,
     }
   }
+  selectLayer() {
+    this.artboard.layerIndex = this.id
+    const z = this.artboard.activeLayerNodes.length
+    this.artboard.activeLayerNodes.forEach(l => {
+      this.artboard.layers[l.id].el.style.zIndex = l === this ? z : z - 1
+      l.el.classList[l === this ? 'add' : 'remove']('current')
+    })
+  }
   releaseAction() {
+    console.log('release')
     this.artboard.activeLayerNodes
       .sort((a, b) => a.y - b.y)
       .forEach((node, i) => {
-        if (i === 0) this.artboard.layerIndex = node.id
+        // if (i === 0) this.artboard.layerIndex = node.id
         node.x = this.defX
         node.y = this.offset + i * this.defH
-        this.artboard.layers[node.id].el.style.zIndex =
-          this.artboard.activeLayerNodes.length - i
+        // this.artboard.layers[node.id].el.style.zIndex =
+        //   this.artboard.activeLayerNodes.length - i
         node.setStyles()
       })
     this.artboard.overlay.el.style.zIndex =

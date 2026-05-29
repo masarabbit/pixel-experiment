@@ -10,8 +10,8 @@ class Input {
         className: isColorInput ? 'color-input-wrap' : 'input-wrap',
         innerHTML: `
           <label class="${isColorInput ? 'color-label' : ''}" for="${
-          props.inputName
-        }">
+            props.inputName
+          }">
             ${isColorInput ? '' : label}
           </label>
           <input 
@@ -79,7 +79,7 @@ class SizeInput extends Input {
     })
   }
   resizeColors = () => {
-    const newArr = settings.splitColors
+    const newArr = settings.spriteColors
     newArr.length = settings.inputs.row.value
     settings.inputs.colors.value = newArr
       .map(arr => {
