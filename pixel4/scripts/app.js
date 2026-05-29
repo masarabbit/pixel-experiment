@@ -122,8 +122,16 @@ window.addEventListener('DOMContentLoaded', () => {
           'hex',
           'color2',
           'hex2',
+          // 'split-col',
+          // 'split-row',
         ].forEach(inputName => {
-          const isNum = ['column', 'row', 'cellSize'].includes(inputName)
+          const isNum = [
+            'column',
+            'row',
+            'cellSize',
+            // 'split-col',
+            // 'split-row',
+          ].includes(inputName)
           const inputClass = ['column', 'row'].includes(inputName)
             ? SizeInput
             : Input
@@ -132,7 +140,7 @@ window.addEventListener('DOMContentLoaded', () => {
             container: nav.contentWrapper,
             isNum,
             className: isNum ? 'no' : '',
-            update: isNum
+            update: ['column', 'row'].includes(inputName)
               ? () => elements.artboard.resizeAndPaintCanvas()
               : null,
           })

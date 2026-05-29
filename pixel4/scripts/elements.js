@@ -62,6 +62,8 @@ const editor = {
   cellSize: 20,
   hex: '#000000',
   hex2: null,
+  // splitRow: 0,
+  // splitCol: 0,
   filename: 'pixel-4',
   shouldShowGrid: true,
   gridWidth: 0.5,
@@ -231,8 +233,8 @@ const editor = {
   },
   splitSpriteSheet() {
     // TODO these should be derived from somewhere
-    const col = 5
-    const row = 1
+    const col = 3
+    const row = 4
     if (elements.artboard.uploadedFile) {
       elements.artboard.output(
         window.URL.createObjectURL(elements.artboard.uploadedFile),
