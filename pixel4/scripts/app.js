@@ -299,7 +299,7 @@ window.addEventListener('DOMContentLoaded', () => {
             className: 'fill',
             shortCut: 'f',
             action: b => {
-              b.el.classList.toggle('active')
+              b.classList.toggle('active')
               editor.fill = !editor.fill
             },
           },
@@ -307,7 +307,7 @@ window.addEventListener('DOMContentLoaded', () => {
             className: 'clear',
             shortCut: 'e',
             action: b => {
-              b.el.classList.toggle('active')
+              b.classList.toggle('active')
               editor.erase = !editor.erase
             },
           },
@@ -340,7 +340,7 @@ window.addEventListener('DOMContentLoaded', () => {
             className: 'color-picker',
             shortCut: 'p',
             action: b => {
-              b.el.classList.toggle('active')
+              b.classList.toggle('active')
               editor.colorPick = !editor.colorPick
             },
           },
@@ -407,7 +407,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('click', e => {
     if (e.target.nodeName === 'BUTTON' && e.target.action) {
-      e.target.action()
+      e.target.action(e.target)
     } else if (e.target === elements.artboard.overlay.el) {
       elements.artboard.createSelectBox(e)
     } else if (e.target === elements.artboard.drawboard.el) {
@@ -470,7 +470,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('keyup', e => {
     const b = editor.shortCuts[e.key.toLowerCase()]
-    if (b) b.button.click()
+    if (b) b.button.action(b.button)
   })
 
   elements.readData()
