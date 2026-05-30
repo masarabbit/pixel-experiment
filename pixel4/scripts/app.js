@@ -83,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
     layer: new NavWindow({
       name: 'layer',
       container: elements.body,
-      isVertical: true,
+      // isVertical: true,
       x: 680,
       y: 180,
       isOpen: true,

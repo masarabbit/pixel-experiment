@@ -4,7 +4,7 @@ import { elements } from '../elements.js'
 // TODO add opacity toggle
 export class LayerNode extends PageObject {
   constructor(props) {
-    const offset = 100
+    const offset = 60
     const defX = 6
     const defH = 42
     super({

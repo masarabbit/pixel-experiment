@@ -31,20 +31,16 @@ class NavWindow extends PageObject {
     this.container.appendChild(this.window)
     this.el = this.window.querySelector('.handle')
     this.contentWrapper = this.window.querySelector('.content-wrapper')
-    this.window
-      .querySelector('.arrow')
-      .addEventListener('click', this.toggleState)
+    this.window.querySelector('.arrow').action = this.toggleState
 
     if (this.content) this.content(this)
     if (this.selectAction)
-      this.window
-        .querySelector('.select-btn')
-        .addEventListener('click', () => this.selectAction(this))
+      this.window.querySelector('.select-btn').action = () =>
+        this.selectAction(this)
 
     if (this.deleteAction)
-      this.window
-        .querySelector('.delete-btn')
-        .addEventListener('click', () => this.deleteAction(this))
+      this.window.querySelector('.delete-btn').action = () =>
+        this.deleteAction(this)
 
     this.setStyles()
     this.addDragEvent()
