@@ -464,6 +464,7 @@ textarea {
 }
 
 .nav-window.close .content-wrapper {
+  position: absolute;
   height: 0;
   padding: 0;
   overflow: hidden;
@@ -514,4 +515,16 @@ textarea {
   100% {
     background-position: calc(-1 * var(--width) * var(--frame-no)) 0px;
   }
+}
+
+.palette {
+  max-width: 180px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.palette div {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 }

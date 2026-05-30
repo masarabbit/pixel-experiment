@@ -32,3 +32,13 @@ export const setProperties = (el, properties) => {
     el.style.setProperty(`--${p}`, properties[p])
   })
 }
+
+export const getPalette = arr => {
+  const countOccurrences = (arr, val) =>
+    arr.reduce((a, v) => (v === val ? a + 1 : a), 0)
+  const orderedByFrequency = arr
+    .filter(dot => dot && dot !== 'transparent')
+    .map(ele => [ele, countOccurrences(arr, ele)])
+    .sort((a, b) => b[1] - a[1])
+  return [...new Set(orderedByFrequency.map(ele => ele[0]))]
+}

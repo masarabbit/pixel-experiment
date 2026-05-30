@@ -209,8 +209,9 @@ export class Button {
       }),
       ...props,
     })
+    this.el.action = props.action
     props.container.appendChild(this.el)
     if (this.shortCut) this.el.setAttribute('data-short-cut', this.shortCut)
-    this.el.addEventListener('click', () => this.action(this))
+    // this.el.addEventListener('click', () => this.action(this))
   }
 }

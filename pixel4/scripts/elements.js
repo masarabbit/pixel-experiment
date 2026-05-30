@@ -268,7 +268,7 @@ const editor = {
     }
   },
   updateColorInputs(color) {
-    this.color = color
+    // this.color = color
     this.inputs.hex.value = color
     this.inputs.color.value = color
     this.inputs.color.label.style.backgroundColor = color

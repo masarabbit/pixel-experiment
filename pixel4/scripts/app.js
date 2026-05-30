@@ -10,14 +10,12 @@ import TraceSvg from './classes/traceSvg.js'
 import { editor, elements } from './elements.js'
 import PageObject from './classes/pageObject.js'
 import { LayerNode } from './classes/layer.js'
+import { getPalette } from './utils.js'
 
 // TODO add cursor for highlighting hover area (and possibly showing alt)
 // TODO some bugs relating to having multiple artboards (maybe need to have separate places to store colors and data url, since these can get mixed up)
 // TODO bugs relating to undo, since it only considers one artboard
-// TODO add more options for combining canvases
 // TODO fix bugs present in the SVG convert (doesn't quite work when there are tranparent holes)
-
-// TODO palettes / presets
 
 window.addEventListener('DOMContentLoaded', () => {
   elements.windows = {
@@ -199,6 +197,19 @@ window.addEventListener('DOMContentLoaded', () => {
             },
           },
           {
+            btnText: 'make palette',
+            action: nav => {
+              elements.windows.palette.contentWrapper.innerHTML = `<div class="palette">
+                ${getPalette(editor.colors).reduce((acc, color) => {
+                  return (
+                    acc +
+                    `<div data-color="${color}" style="background-color: ${color};"></div>`
+                  )
+                }, '')}
+              </div>`
+            },
+          },
+          {
             className: 'trace-svg',
             action: () => {
               new TraceSvg()
@@ -376,6 +387,13 @@ window.addEventListener('DOMContentLoaded', () => {
       }),
       content: nav => nav.contentWrapper.append(nav.img),
     }),
+    palette: new NavWindow({
+      name: 'palette',
+      container: elements.body,
+      x: 880,
+      y: 180,
+      isOpen: true,
+    }),
   }
 
   document.querySelectorAll('button').forEach(b => {
@@ -388,7 +406,9 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   window.addEventListener('click', e => {
-    if (e.target === elements.artboard.overlay.el) {
+    if (e.target.nodeName === 'BUTTON' && e.target.action) {
+      e.target.action()
+    } else if (e.target === elements.artboard.overlay.el) {
       elements.artboard.createSelectBox(e)
     } else if (e.target === elements.artboard.drawboard.el) {
       elements.artboard.colorCell(e)
@@ -400,7 +420,8 @@ window.addEventListener('DOMContentLoaded', () => {
         elements.artboard.deleteLayerNode(+e.target.dataset.id)
     } else if (e.target.dataset.id) {
       elements.artboard.layerNodes[+e.target.dataset.id].selectLayer()
-    }
+    } else if (e.target?.dataset?.color)
+      editor.updateColorInputs(e.target.dataset.color)
   })
 
   window.addEventListener('pointerdown', e => {
