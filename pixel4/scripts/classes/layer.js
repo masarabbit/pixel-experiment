@@ -1,5 +1,5 @@
 import PageObject from './pageObject.js'
-import { elements } from '../elements.js'
+import { elements, editor } from '../elements.js'
 
 // TODO add opacity toggle
 export class LayerNode extends PageObject {
@@ -46,12 +46,17 @@ export class LayerNode extends PageObject {
     }
   }
   selectLayer() {
+    // console.log('select', this.id)
     this.artboard.layerIndex = this.id
     const z = this.artboard.activeLayerNodes.length
     this.artboard.activeLayerNodes.forEach(l => {
       this.artboard.layers[l.id].el.style.zIndex = l === this ? z : z - 1
       l.el.classList[l === this ? 'add' : 'remove']('current')
     })
+
+    // TODO this doesn't guarantee that the colors are updated when layers are created, so we need other way
+    this.artboard.layers[this.id].extractColors()
+    editor.inputs.colors.value = editor.colors
   }
   releaseAction() {
     console.log('release')

@@ -246,10 +246,16 @@ const editor = {
               w,
               h
             )
-            if (i < frameNo) elements.artboard.addLayer()
+            if (i < frameNo) {
+              elements.artboard.addLayer()
+            } else {
+              elements.artboard.drawboard.extractColors()
+              editor.inputs.colors.value = editor.colors
+            }
           })
         }
       )
+      // elements.artboard.layerNodes[0].selectLayer()
     }
   },
   updateColorInputs(color) {
