@@ -163,17 +163,6 @@ const editor = {
       },
     })
   },
-  getLayerOffsets(boards) {
-    //* weirdly, i needs to be inverted here
-    return boards.reduce((acc, w, i) => {
-      const i2 = boards.length - 1 - i
-      acc.push({
-        x: (i2 % editor.spriteCol) * elements.artboard.column,
-        y: Math.floor(i2 / editor.spriteCol) * elements.artboard.row,
-      })
-      return acc
-    }, [])
-  },
   // TODO this is broken now, but maybe isn't required since we now have createSprite
   // combineArtboards() {
   //   const { offsets, column } = this.getLayerOffsets(
@@ -197,14 +186,6 @@ const editor = {
   createSpriteSheet() {
     //* We need to remember current artboard because creating a new one switches it.
     const currentArtboard = elements.artboard
-    const checkedLayers = elements.artboard.layers.filter(
-      (w, i) =>
-        currentArtboard.activeLayerNodes
-          .find(n => n.id === i)
-          ?.el.querySelector('input[type="checkbox"]').checked
-    )
-    const offsets = this.getLayerOffsets(checkedLayers)
-
     this.inputs.column.value = elements.artboard.column * editor.spriteCol
     this.inputs.row.value = elements.artboard.row * editor.spriteRow
 
@@ -212,6 +193,7 @@ const editor = {
     const { column, row } = currentArtboard.activeLayers[0]
     currentArtboard.activeLayerNodes
       .filter(w => w?.el.querySelector('input[type="checkbox"]').checked)
+      .sort((a, b) => a.y - b.y)
       .forEach((w, i) => {
         elements.artboard.drawboard.ctx.putImageData(
           currentArtboard.layers[w.id].ctx.getImageData(
@@ -220,8 +202,8 @@ const editor = {
             column * this.d,
             row * this.d
           ),
-          (offsets?.[i].x || 0) * this.d,
-          (offsets?.[i].y || 0) * this.d
+          (i % editor.spriteCol) * currentArtboard.column * this.d,
+          Math.floor(i / editor.spriteCol) * currentArtboard.row * this.d
         )
       })
     elements.artboard.drawboard.extractColors()

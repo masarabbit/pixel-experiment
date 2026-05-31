@@ -514,11 +514,12 @@ textarea {
 
 @keyframes frame-animation {
   0% {
-    background-position: 0px calc(var(--offset-y) * var(--height));
+    background-position: 0px
+      calc((var(--frame-row) - var(--offset-y)) * var(--height));
   }
   100% {
     background-position: calc(-1 * var(--width) * var(--frame-col))
-      calc(var(--offset-y) * var(--height));
+      calc((var(--frame-row) - var(--offset-y)) * var(--height));
   }
 }
 
