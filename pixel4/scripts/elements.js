@@ -220,6 +220,10 @@ const editor = {
   },
   splitSpriteSheet() {
     const { spriteRow: row, spriteCol: col, d } = editor
+    if (row * col <= 0) {
+      window.alert('spriteRow and/or spriteCol needs to more than 0')
+      return
+    }
     if (elements.artboard.uploadedFile) {
       elements.artboard.output(
         window.URL.createObjectURL(elements.artboard.uploadedFile),
