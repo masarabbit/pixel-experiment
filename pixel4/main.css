@@ -502,19 +502,23 @@ textarea {
   height: var(--height);
   pointer-events: none;
   background-color: #fff;
-  --frame-no: 2;
-  background-size: calc(var(--width) * var(--frame-no)) var(--height);
-  animation: frame-animation infinite calc(0.2s * var(--frame-no))
-    steps(var(--frame-no));
+  --frame-col: 0;
+  --frame-row: 0;
+  background-size: calc(var(--width) * var(--frame-col))
+    calc(var(--height) * var(--frame-row));
+  animation: frame-animation infinite calc(0.2s * var(--frame-col))
+    steps(var(--frame-col));
   image-rendering: pixelated;
+  --offset-y: 0;
 }
 
 @keyframes frame-animation {
   0% {
-    background-position: 0px 0px;
+    background-position: 0px calc(var(--offset-y) * var(--height));
   }
   100% {
-    background-position: calc(-1 * var(--width) * var(--frame-no)) 0px;
+    background-position: calc(-1 * var(--width) * var(--frame-col))
+      calc(var(--offset-y) * var(--height));
   }
 }
 

@@ -52,6 +52,7 @@ export class Input {
     this.input.addEventListener('change', e => {
       editor[this.key] = e.target.value
       if (this.inputName.includes('hex')) this.updateColor()
+      if (this.update) this.update(this.input)
     })
   }
 }

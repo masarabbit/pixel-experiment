@@ -128,12 +128,24 @@ window.addEventListener('DOMContentLoaded', () => {
           { inputName: 'hex2', inputClass: Input },
           { inputName: 'spriteCol', isNum: true, inputClass: Input },
           { inputName: 'spriteRow', isNum: true, inputClass: Input },
-        ].forEach(({ inputName, isNum, inputClass }) => {
+          {
+            inputName: 'spriteOffset',
+            isNum: true,
+            inputClass: Input,
+            update: input => {
+              elements.windows.preview.img.style.setProperty(
+                '--offset-y',
+                input.value
+              )
+            },
+          },
+        ].forEach(({ inputName, isNum, inputClass, update }) => {
           editor.inputs[inputName] = new inputClass({
             inputName,
             container: nav.contentWrapper,
             isNum,
             className: isNum ? 'no' : '',
+            update,
           })
         })
         nav.addButtons([
@@ -370,10 +382,10 @@ window.addEventListener('DOMContentLoaded', () => {
               console.log('editor', editor)
             },
           },
-          {
-            btnText: 'combine',
-            action: () => editor.combineArtboards(),
-          },
+          // {
+          //   btnText: 'combine',
+          //   action: () => editor.combineArtboards(),
+          // },
         ]),
     }),
     preview: new NavWindow({

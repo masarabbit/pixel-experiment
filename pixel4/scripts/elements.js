@@ -66,6 +66,7 @@ const editor = {
   hex2: null,
   spriteRow: 0,
   spriteCol: 0,
+  spriteOffset: 0,
   filename: 'pixel-4',
   shouldShowGrid: true,
   gridWidth: 0.5,
@@ -162,38 +163,37 @@ const editor = {
       },
     })
   },
-  calculateColumnAndOffset(boards) {
-    return boards.reduce(
-      (acc, w) => {
-        acc.column += w.artboard.column
-        acc.offsets.push(acc.column)
-        return acc
-      },
-      {
-        offsets: [],
-        column: 0,
-      }
-    )
+  getLayerOffsets(boards) {
+    //* weirdly, i needs to be inverted here
+    return boards.reduce((acc, w, i) => {
+      const i2 = boards.length - 1 - i
+      acc.push({
+        x: (i2 % editor.spriteCol) * elements.artboard.column,
+        y: Math.floor(i2 / editor.spriteCol) * elements.artboard.row,
+      })
+      return acc
+    }, [])
   },
-  combineArtboards() {
-    const { offsets, column } = this.calculateColumnAndOffset(
-      elements.artboardWindows
-    )
-    this.inputs.column.value = column
+  // TODO this is broken now, but maybe isn't required since we now have createSprite
+  // combineArtboards() {
+  //   const { offsets, column } = this.getLayerOffsets(
+  //     elements.artboardWindows
+  //   )
+  //   this.inputs.column.value = column
 
-    this.createNewArtboard()
+  //   this.createNewArtboard()
 
-    elements.artboardWindows.forEach((w, i) => {
-      const { column, row, drawboard } = w.artboard
-      elements.artboard.drawboard.ctx.putImageData(
-        drawboard.ctx.getImageData(0, 0, column * this.d, row * this.d),
-        (offsets?.[i - 1] || 0) * this.d,
-        0
-      )
-    })
-    elements.artboard.drawboard.extractColors()
-    this.inputs.colors.value = this.colors
-  },
+  //   elements.artboardWindows.forEach((w, i) => {
+  //     const { column, row, drawboard } = w.artboard
+  //     elements.artboard.drawboard.ctx.putImageData(
+  //       drawboard.ctx.getImageData(0, 0, column * this.d, row * this.d),
+  //       (offsets?.[i - 1] || 0) * this.d,
+  //       0
+  //     )
+  //   })
+  //   elements.artboard.drawboard.extractColors()
+  //   this.inputs.colors.value = this.colors
+  // },
   createSpriteSheet() {
     //* We need to remember current artboard because creating a new one switches it.
     const currentArtboard = elements.artboard
@@ -203,11 +203,13 @@ const editor = {
           .find(n => n.id === i)
           ?.el.querySelector('input[type="checkbox"]').checked
     )
-    const { offsets, column } = this.calculateColumnAndOffset(checkedLayers)
-    this.inputs.column.value = column
+    const offsets = this.getLayerOffsets(checkedLayers)
+
+    this.inputs.column.value = elements.artboard.column * editor.spriteCol
+    this.inputs.row.value = elements.artboard.row * editor.spriteRow
 
     this.createNewArtboard()
-    const { column: col, row } = currentArtboard.activeLayers[0]
+    const { column, row } = currentArtboard.activeLayers[0]
     currentArtboard.activeLayerNodes
       .filter(w => w?.el.querySelector('input[type="checkbox"]').checked)
       .forEach((w, i) => {
@@ -215,11 +217,11 @@ const editor = {
           currentArtboard.layers[w.id].ctx.getImageData(
             0,
             0,
-            col * this.d,
+            column * this.d,
             row * this.d
           ),
-          (offsets?.[i - 1] || 0) * this.d,
-          0
+          (offsets?.[i].x || 0) * this.d,
+          (offsets?.[i].y || 0) * this.d
         )
       })
     elements.artboard.drawboard.extractColors()
@@ -227,10 +229,11 @@ const editor = {
 
     elements.windows.preview.img.style.backgroundImage = `url(${elements.artboard.drawboard.el.toDataURL()})`
     setProperties(elements.windows.preview.img, {
-      w: col + 'px',
+      w: column + 'px',
       h: row + 'px',
       m: this.d,
-      'frame-no': checkedLayers.length,
+      'frame-col': editor.spriteCol,
+      'frame-row': editor.spriteRow,
     })
   },
   splitSpriteSheet() {
