@@ -105,7 +105,7 @@ export class SizeInput extends Input {
     this.input.addEventListener('change', e => {
       this.resizeColors()
       editor[this.key] = +e.target.value
-      elements.artboard.resizeAndPaintCanvas()
+      ;['resize', 'paintCanvas'].forEach(action => elements.artboard[action]())
     })
   }
   resizeColors = () => {

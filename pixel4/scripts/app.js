@@ -196,7 +196,7 @@ window.addEventListener('DOMContentLoaded', () => {
               // could be refactored to partially reuse this codeblock
               const currentCellSize = editor.cellSize
               editor.inputs.cellSize.value = 1
-              elements.artboard.resizeAndPaintCanvas()
+              elements.artboard.resizeAndExtractColors()
 
               elements.artboard.dataUrl =
                 elements.artboard.drawboard.el.toDataURL()
@@ -204,7 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
               setTimeout(() => {
                 editor.inputs.cellSize.value = currentCellSize
-                elements.artboard.resizeAndPaintCanvas()
+                elements.artboard.resizeAndExtractColors()
               }, 500)
             },
           },

@@ -314,7 +314,7 @@ class Artboard extends PageObject {
     this.overlay.resizeCanvas(this.size)
     this.overlay.drawGrid()
   }
-  resizeAndPaintCanvas() {
+  resizeAndExtractColors() {
     // ;['resize', 'paintCanvas'].forEach(action => this[action]())
     this.resize()
     this.drawboard.extractColors()
