@@ -1,4 +1,4 @@
-import { SAVE_DATA_NAME, sample } from '../config.js'
+import { SAVE_DATA_NAME, sample } from '../../config.js'
 
 window.addEventListener('DOMContentLoaded', () => {
   const wrapper = document.querySelector('.wrapper')
@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     wrapper.appendChild(box)
     box.dataset.size = `${config.column} x ${config.row}`
     box.addEventListener('click', () => {
-      window.location = `/pixel-experiment/pixel4/?library-index=${i}`
+      window.location = `./?library-index=${i}`
     })
   })
 })

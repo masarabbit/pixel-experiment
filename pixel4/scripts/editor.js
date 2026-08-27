@@ -1,4 +1,4 @@
-import { SAVE_DATA_NAME } from '../config.js'
+import { SAVE_DATA_NAME } from '../../config.js'
 
 window.addEventListener('DOMContentLoaded', () => {
   const saveData = localStorage.getItem(SAVE_DATA_NAME)
