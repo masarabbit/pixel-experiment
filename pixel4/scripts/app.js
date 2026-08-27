@@ -8,9 +8,8 @@ import {
 import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { editor, elements } from './elements.js'
-import PageObject from './classes/pageObject.js'
-import { LayerNode } from './classes/layer.js'
 import { getPalette } from './utils.js'
+import { SAVE_DATA_NAME, sample } from '../../config.js'
 
 // TODO add cursor for highlighting hover area (and possibly showing alt)
 // TODO some bugs relating to having multiple artboards (maybe need to have separate places to store colors and data url, since these can get mixed up)
@@ -192,21 +191,7 @@ window.addEventListener('DOMContentLoaded', () => {
           },
           {
             className: 'output-data-url-from-one-pixel-image',
-            action: () => {
-              // could be refactored to partially reuse this codeblock
-              const currentCellSize = editor.cellSize
-              editor.inputs.cellSize.value = 1
-              elements.artboard.resizeAndExtractColors()
-
-              elements.artboard.dataUrl =
-                elements.artboard.drawboard.el.toDataURL()
-              editor.inputs.dataUrl.value = elements.artboard.dataUrl
-
-              setTimeout(() => {
-                editor.inputs.cellSize.value = currentCellSize
-                elements.artboard.resizeAndExtractColors()
-              }, 500)
-            },
+            action: () => editor.outputDataWithOnePixelCell(),
           },
           {
             btnText: 'make palette',
@@ -382,6 +367,22 @@ window.addEventListener('DOMContentLoaded', () => {
               console.log('editor', editor)
             },
           },
+          {
+            btnText: 'save data',
+            action: () => {
+              editor.outputDataWithOnePixelCell()
+              const { dataUrl, column, row, filename } = editor
+              const savedData = localStorage.getItem(SAVE_DATA_NAME)
+              const parsedData = savedData ? JSON.parse(savedData) : []
+              localStorage.setItem(
+                SAVE_DATA_NAME,
+                JSON.stringify([
+                  ...parsedData,
+                  { dataUrl, column, row, name: filename },
+                ])
+              )
+            },
+          },
           // {
           //   btnText: 'combine',
           //   action: () => editor.combineArtboards(),
@@ -486,5 +487,22 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   elements.readData()
+
+  const param = new URLSearchParams(window.location.search)
+  const libraryIndex = param.get('library-index')
+  const saveData = localStorage.getItem(SAVE_DATA_NAME)
+  if (!isNaN(libraryIndex)) {
+    const parsedData = saveData ? JSON.parse(saveData) : []
+    const data = [...sample, ...parsedData][libraryIndex]
+    if (data) {
+      ;['dataUrl', 'column', 'row'].forEach(
+        param => (editor.inputs[param].value = data[param])
+      )
+      editor.inputs.filename.value = data.name
+      elements.artboard.resize()
+      elements.artboard.output(data.dataUrl)
+    }
+  }
+
   editor.recordState()
 })

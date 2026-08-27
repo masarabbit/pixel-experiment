@@ -268,6 +268,19 @@ const editor = {
     this.inputs.color.value = color
     this.inputs.color.label.style.backgroundColor = color
   },
+  outputDataWithOnePixelCell() {
+    const currentCellSize = this.cellSize
+    this.inputs.cellSize.value = 1
+    elements.artboard.resizeAndExtractColors()
+
+    elements.artboard.dataUrl = elements.artboard.drawboard.el.toDataURL()
+    this.inputs.dataUrl.value = elements.artboard.dataUrl
+
+    setTimeout(() => {
+      this.inputs.cellSize.value = currentCellSize
+      elements.artboard.resizeAndExtractColors()
+    }, 500)
+  },
 }
 
 export { elements, editor }
