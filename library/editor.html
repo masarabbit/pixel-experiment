@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="editor.js" charset="utf-8"></script>
+    <title>editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <style>
+    body {
+      background-color: #160537;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      padding: 0;
+    }
+    textarea {
+      width: 100%;
+      height: auto;
+      border: 0;
+      color: #0badd1;
+      background-color: #167b914f;
+      font-size: 0.7rem;
+      margin-top: 40px;
+    }
+    .btn-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-wrapper button {
+      position: relative;
+      z-index: 10;
+    }
+    button {
+      background-color: transparent;
+      border: 1px solid #fff;
+      color: #fff;
+      padding: 4px 8px;
+    }
+    a {
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      text-decoration: none;
+      margin-left: 8px;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <body>
+    <nav>
+      <div class="btn-wrapper">
+        <button data-id="download">download</button>
+        <button data-id="delete">delete</button>
+        <button data-id="save">save</button>
+        <a href="/library">library</a>
+      </div>
+    </nav>
+    <textarea spellcheck="false"></textarea>
+  </body>
+</html>

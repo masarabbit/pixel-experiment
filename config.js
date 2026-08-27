@@ -1,4 +1,4 @@
-export const SAVE_DATA_NAME = 'pixel-experiment-library'
+export const SAVE_DATA_NAME = 'pixel4-library'
 
 export const sample = [
   {
