@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     wrapper.appendChild(box)
     box.dataset.size = `${config.column} x ${config.row}`
     box.addEventListener('click', () => {
-      window.location = `/pixel4/?library-index=${i}`
+      window.location = `/pixel-experiment/pixel4/?library-index=${i}`
     })
   })
 })
