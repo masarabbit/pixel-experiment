@@ -489,11 +489,11 @@ window.addEventListener('DOMContentLoaded', () => {
   elements.readData()
 
   const param = new URLSearchParams(window.location.search)
-  const libraryIndex = param.get('library-index')
+  const imgName = param.get('img')
   const saveData = localStorage.getItem(SAVE_DATA_NAME)
-  if (!isNaN(libraryIndex)) {
+  if (imgName) {
     const parsedData = saveData ? JSON.parse(saveData) : []
-    const data = [...sample, ...parsedData][libraryIndex]
+    const data = [...sample, ...parsedData].find(c => c.name === imgName)
     if (data) {
       ;['dataUrl', 'column', 'row'].forEach(
         param => (editor.inputs[param].value = data[param])
