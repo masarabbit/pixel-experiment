@@ -305,7 +305,7 @@ class Artboard extends PageObject {
     this.d = editor.d
     this.setStyles()
     this.activeLayers.forEach((layer, i) => {
-      const img = this.activeLayerNodes.find(n => n.id === i).img
+      // const img = this.activeLayerNodes.find(n => n.id === i).img
       const colors = []
       layer.extractColors(colors)
       layer.resizeCanvas(this.size)
