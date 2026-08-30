@@ -1,6 +1,14 @@
-import { SAVE_DATA_NAME, sample } from '../../config.js'
+import { getData } from '../../config.js'
 
 window.addEventListener('DOMContentLoaded', () => {
+  const menu = document.getElementById('menu')
+
+  const settings = {
+    activeElement: null,
+    elements: [],
+    blocks: [],
+    artboard: null,
+  }
   class PageObject {
     constructor() {
       this.pos = { x: 0, y: 0 }
@@ -26,49 +34,108 @@ window.addEventListener('DOMContentLoaded', () => {
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
         innerHTML:
-          '<div class="window-handle">TEST</div>' +
+          '<div class="window-handle" data-id="window" >artboard</div>' +
           '<div class="artboard"></div>' +
-          '<div class="size-handle"></div>',
+          '<div class="size-handle" data-id="window" ></div>',
       })
-      this.isWindowActive = false
+      this.id = 'window'
 
       document.body.appendChild(this.el)
-      this.artboard = this.el.querySelector('.artboard')
+      settings.artboard = this.el.querySelector('.artboard')
+      settings.elements.push(this)
 
       this.setSize({ w: 200, h: 100 })
-
-      this.el.addEventListener('pointerdown', e => {
-        this.isWindowActive = true
-        this.pointerPos = { x: e.pageX - this.pos.x, y: e.pageY - this.pos.y }
-        this.grabSize = {
-          w: this.size.w - this.pos.x,
-          h: this.size.h - this.pos.y,
-        }
-      })
-      ;['pointerup', 'pointercancel'].forEach(action => {
-        this.el.addEventListener(action, () => {
-          this.isWindowActive = false
-        })
-      })
-
-      this.el.addEventListener('pointermove', e => {
-        e.target.setPointerCapture(e.pointerId)
-        if (this.isWindowActive) {
-          if (e.target.classList.contains('size-handle')) {
-            this.setSize({
-              w: this.grabSize.w + (e.pageX - this.pointerPos.x),
-              h: this.grabSize.h + (e.pageY - this.pointerPos.y),
-            })
-          } else {
-            this.setPos({
-              x: e.pageX - this.pointerPos.x,
-              y: e.pageY - this.pointerPos.y,
-            })
-          }
-        }
-      })
     }
   }
 
+  class Parameter extends PageObject {
+    constructor() {
+      super()
+      this.el = Object.assign(document.createElement('div'), {
+        className: 'window',
+        innerHTML:
+          '<div class="window-handle" data-id="parameter" >parameter</div>' +
+          '<div class="content"></div>',
+      })
+      this.id = 'parameter'
+
+      document.body.appendChild(this.el)
+      this.content = this.el.querySelector('.artboard')
+      settings.elements.push(this)
+
+      this.setSize({ w: 200, h: 100 })
+    }
+  }
+
+  window.addEventListener('pointerdown', e => {
+    console.log(e.target.dataset.id)
+    const el = settings.elements.find(
+      element => element.id === e.target.dataset.id
+    )
+    if (el) {
+      settings.activeElement = el
+      el.pointerPos = { x: e.pageX - el.pos.x, y: e.pageY - el.pos.y }
+      el.grabSize = {
+        w: el.size.w - el.pos.x,
+        h: el.size.h - el.pos.y,
+      }
+    }
+  })
+  ;['pointerup', 'pointercancel'].forEach(action => {
+    window.addEventListener(action, () => {
+      settings.activeElement = null
+    })
+  })
+
+  window.addEventListener('pointermove', e => {
+    e.target.setPointerCapture(e.pointerId)
+    const el = settings.activeElement
+    if (el) {
+      if (e.target.classList.contains('size-handle')) {
+        el.setSize({
+          w: el.grabSize.w + (e.pageX - el.pointerPos.x),
+          h: el.grabSize.h + (e.pageY - el.pointerPos.y),
+        })
+      } else {
+        el.setPos({
+          x: e.pageX - el.pointerPos.x,
+          y: e.pageY - el.pointerPos.y,
+        })
+      }
+    }
+  })
+
   new Window()
+  new Parameter()
+
+  class Block extends PageObject {
+    constructor({ dataUrl, column, row, name }) {
+      super()
+      this.el = Object.assign(document.createElement('div'), {
+        className: 'block',
+        innerHTML: `<img src="${dataUrl}" />`,
+      })
+      settings.elements.push(this)
+      settings.blocks.push(this)
+      this.name = name
+      this.id = `${name}-${settings.blocks.filter(b => b.name === name).length}`
+      this.el.dataset.id = this.id
+      settings.artboard.appendChild(this.el)
+
+      this.setSize({ w: column, h: row })
+    }
+  }
+
+  getData().forEach(d => {
+    const box = Object.assign(document.createElement('div'), {
+      className: 'box',
+      innerHTML: `<img draggable="false" src="${d.dataUrl}" />`,
+    })
+    menu.appendChild(box)
+    box.dataset.size = `${d.column} x ${d.row}`
+    box.addEventListener('click', () => {
+      menu.hidePopover()
+      new Block(d)
+    })
+  })
 })

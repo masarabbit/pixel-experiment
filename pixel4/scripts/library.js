@@ -1,12 +1,9 @@
-import { SAVE_DATA_NAME, sample } from '../../config.js'
+import { getData } from '../../config.js'
 
 window.addEventListener('DOMContentLoaded', () => {
   const wrapper = document.querySelector('.wrapper')
 
-  const savedData = localStorage.getItem(SAVE_DATA_NAME)
-  const parsedData = savedData ? JSON.parse(savedData) : []
-
-  ;[...sample, ...parsedData].forEach(config => {
+  getData().forEach(config => {
     const box = Object.assign(document.createElement('div'), {
       className: 'box',
       innerHTML: `<img draggable="false" src="${config.dataUrl}" />`,

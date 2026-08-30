@@ -72,3 +72,10 @@ export const sample = [
     row: 25,
   },
 ]
+
+export const getData = () => {
+  const savedData = localStorage.getItem(SAVE_DATA_NAME)
+  const parsedData = savedData ? JSON.parse(savedData) : []
+
+  return [...sample, ...parsedData]
+}
