@@ -61,7 +61,7 @@ img {
   box-shadow: 0 0 0 1px hotpink;
   width: 300px;
   height: 200px;
-  pointer-events: none;
+  /* pointer-events: none; */
 }
 
 .window-handle {
@@ -70,7 +70,7 @@ img {
   padding: 4px;
   text-transform: uppercase;
   font-size: 0.7rem;
-  pointer-events: all;
+  /* pointer-events: all; */
 }
 
 .artboard {
@@ -86,7 +86,7 @@ img {
   box-shadow: 0 0 0 1px hotpink;
   bottom: 0;
   right: 0;
-  pointer-events: all;
+  /* pointer-events: all; */
 }
 
 .menu {
@@ -139,4 +139,18 @@ button {
 button:hover {
   background-color: hotpink;
   color: #fff;
+}
+
+.stamp {
+  position: absolute;
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.stamp:empty {
+  display: none;
 }
