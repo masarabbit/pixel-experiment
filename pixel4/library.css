@@ -154,3 +154,18 @@ button:hover {
 .stamp:empty {
   display: none;
 }
+
+.content {
+  padding: 8px;
+}
+
+label {
+  color: hotpink;
+}
+
+.content input {
+  border: 1px solid hotpink;
+  margin-left: 4px;
+  width: 60px;
+  padding: 0 4px;
+}

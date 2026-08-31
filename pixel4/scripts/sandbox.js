@@ -2,9 +2,15 @@ import { getData } from '../../config.js'
 
 const SANDBOX_SAVE_DATA = 'sandbox-save-data'
 
+// TODO allow config save / download
+// TODO allow ratio change (based on this, multiplies the size of stamp and stamped image)
+
 window.addEventListener('DOMContentLoaded', () => {
   const menu = document.getElementById('menu')
   const stamp = document.querySelector('.stamp')
+
+  const nearestN = (x, n = 2) =>
+    x === 0 ? 0 : x - 1 + Math.abs(((x - 1) % n) - n)
 
   const settings = {
     activeElement: null,
@@ -22,8 +28,8 @@ window.addEventListener('DOMContentLoaded', () => {
       this.pointerPos = { x: 0, y: 0 }
     }
     setPos(pos) {
-      this.pos = pos
-      this.el.style.transform = `translate(${pos.x}px, ${pos.y}px)`
+      if (pos) this.pos = { x: nearestN(pos.x), y: nearestN(pos.y) }
+      this.el.style.transform = `translate(${this.pos.x}px, ${this.pos.y}px)`
     }
     setSize(size) {
       this.size = size
@@ -81,12 +87,33 @@ window.addEventListener('DOMContentLoaded', () => {
       this.id = 'parameter'
 
       document.body.appendChild(this.el)
-      this.content = this.el.querySelector('.artboard')
+      this.content = this.el.querySelector('.content')
       settings.elements.push(this)
       settings.parameterWindow = this
+      ;['x', 'y', 'z', 'ratio'].forEach(param => {
+        const input = Object.assign(document.createElement('div'), {
+          innerHTML:
+            '<div class="input-wrapper">' +
+            `<label>${param}</label>` +
+            `<input type="number" placeholder="${param}" data-type="${param}" />` +
+            '</div>',
+        })
+        this.content.appendChild(input)
+        input.querySelector('input').addEventListener('change', e => {
+          this[param] = +e.target.value
+          if (settings.focusElement) {
+            settings.focusElement[param] = +e.target.value
+            settings.focusElement.setPos()
+          }
+        })
+      })
 
-      this.setSize({ w: 200, h: 100 })
+      this.setSize({ w: 200, h: 120 })
       if (pos) this.setPos(pos)
+    }
+    setParam(param, value) {
+      this[param] = value
+      this.content.querySelector(`[data-type=${param}]`).value = value
     }
   }
 
@@ -112,13 +139,23 @@ window.addEventListener('DOMContentLoaded', () => {
   })
   ;['pointerup', 'pointercancel'].forEach(action => {
     window.addEventListener(action, () => {
+      if (settings.activeElement instanceof Block) {
+        settings.focusElement = settings.activeElement
+        settings.parameterWindow.setParam('x', settings.activeElement.pos.x)
+        settings.parameterWindow.setParam('y', settings.activeElement.pos.y)
+        settings.parameterWindow.setParam(
+          'z',
+          settings.blocks.indexOf(settings.activeElement)
+        )
+      }
+
       settings.activeElement = null
       localStorage.setItem(
         SANDBOX_SAVE_DATA,
         JSON.stringify({
           artboard: settings.artboardWindow,
           parameter: settings.parameterWindow,
-          blocks: settings.blocks,
+          blocks: settings.blocks.sort((a, b) => a.z - b.z),
         })
       )
     })
@@ -161,6 +198,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
       this.setSize(size || { w: column, h: row })
       if (pos) this.setPos(pos)
+      this.z = settings.blocks.indexOf(this)
+    }
+    set x(value) {
+      this.pos.x = value
+    }
+    set y(value) {
+      this.pos.y = value
+    }
+    set z(value) {
+      this._z = value
+      this.el.style.zIndex = value
+    }
+    get z() {
+      return this._z
     }
   }
 
@@ -201,5 +252,30 @@ window.addEventListener('DOMContentLoaded', () => {
   })
   window.addEventListener('keyup', e => {
     if (e.key.toLowerCase() === 'd') settings.deleteMode = false
+  })
+
+  const downloadImage = canvas => {
+    const link = document.createElement('a')
+    link.download = `sandbox_${new Date().getTime()}.png`
+    link.href = canvas.toDataURL()
+    link.click()
+  }
+
+  document.querySelector('.save').addEventListener('click', () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const { w, h } = settings.artboardWindow.size
+    canvas.setAttribute('width', w)
+    canvas.setAttribute('height', h)
+    settings.blocks.forEach(b => {
+      ctx.drawImage(
+        b.el.querySelector('img'),
+        b.pos.x,
+        b.pos.y,
+        b.size.w,
+        b.size.h
+      )
+    })
+    downloadImage(canvas)
   })
 })
