@@ -118,6 +118,7 @@ window.addEventListener('DOMContentLoaded', () => {
             settings.focusElement.setPos()
             settings.focusElement.setSize()
           }
+          saveConfig()
         })
       })
       this.setParam('default-scale', defaultScale)
