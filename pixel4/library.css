@@ -207,6 +207,7 @@ textarea {
   color: #0badd1;
   background-color: #167b914f;
   font-size: 0.7rem;
+  padding: 8px;
 }
 
 .input-wrapper:has([data-type='default-scale']) {

@@ -87,8 +87,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  class Parameter extends PageObject {
-    constructor(pos = { x: 300, y: 40 }) {
+  class ParameterMenu extends PageObject {
+    constructor(pos = { x: 300, y: 40 }, defaultScale) {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
@@ -120,7 +120,7 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         })
       })
-      this.setParam('default-scale', 1)
+      this.setParam('default-scale', defaultScale)
       this.setSize({ w: 200, h: 'auto' })
       this.setPos(pos)
     }
@@ -245,12 +245,12 @@ window.addEventListener('DOMContentLoaded', () => {
   if (savedData) {
     const data = JSON.parse(savedData)
     new Artboard(data.artboard)
-    new Parameter(data.parameter.pos)
+    new ParameterMenu(data.parameter.pos, data.parameter['default-scale'])
 
     data.blocks.forEach(b => new Block(b))
   } else {
     new Artboard()
-    new Parameter()
+    new ParameterMenu()
   }
 
   getData().forEach(d => {
