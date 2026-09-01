@@ -9,12 +9,18 @@
   </head>
   <body>
     <nav>
-      <button popovertarget="menu">menu</button>
+      <button popovertarget="stamp-menu">stamp</button>
+      <button popovertarget="config-menu">config</button>
       <button class="clear-stamp">clear</button>
       <button class="generate">generate</button>
       <button class="save">save</button>
     </nav>
     <div class="stamp"></div>
-    <div class="menu" id="menu" popover></div>
+    <div class="menu" id="stamp-menu" popover></div>
+    <div class="menu" id="config-menu" popover>
+      <button class="config-save">save</button>
+      <button class="download">download</button>
+      <textarea spellcheck="false"></textarea>
+    </div>
   </body>
 </html>

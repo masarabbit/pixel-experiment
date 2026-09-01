@@ -2,12 +2,10 @@ import { getData } from '../../config.js'
 
 const SANDBOX_SAVE_DATA = 'sandbox-save-data'
 
-// TODO allow config save / download
-// TODO allow ratio change (based on this, multiplies the size of stamp and stamped image)
-
 window.addEventListener('DOMContentLoaded', () => {
-  const menu = document.getElementById('menu')
+  const stampMenu = document.getElementById('stamp-menu')
   const stamp = document.querySelector('.stamp')
+  const configTextarea = document.querySelector('textarea')
 
   const nearestN = (x, n = 2) =>
     x === 0 ? 0 : x - 1 + Math.abs(((x - 1) % n) - n)
@@ -26,23 +24,32 @@ window.addEventListener('DOMContentLoaded', () => {
       this.pos = { x: 0, y: 0 }
       this.grabSize = { w: 0, h: 0 }
       this.pointerPos = { x: 0, y: 0 }
+      this._size = { w: 0, h: 0 }
+      this.scale = 1
+      this['default-scale'] = 1
     }
     setPos(pos) {
       if (pos) this.pos = { x: nearestN(pos.x), y: nearestN(pos.y) }
       this.el.style.transform = `translate(${this.pos.x}px, ${this.pos.y}px)`
     }
     setSize(size) {
-      this.size = size
+      if (size) this._size = size
       Object.assign(this.el.style, {
-        width: `${size.w}px`,
-        height: `${size.h}px`,
+        width: `${this.size.w}px`,
+        height: !isNaN(this.size.h) ? `${this.size.h}px` : 'auto',
       })
+    }
+    get size() {
+      return {
+        w: this._size.w * this.scale,
+        h: !isNaN(this._size.h) ? this._size.h * this.scale : 'auto',
+      }
     }
   }
 
-  class Window extends PageObject {
+  class Artboard extends PageObject {
     constructor(
-      { size, pos } = { size: { w: 200, h: 100 }, pos: { x: 0, y: 0 } }
+      { _size, pos } = { _size: { w: 200, h: 100 }, pos: { x: 40, y: 40 } }
     ) {
       super()
       this.el = Object.assign(document.createElement('div'), {
@@ -59,16 +66,19 @@ window.addEventListener('DOMContentLoaded', () => {
       this.artboard = this.el.querySelector('.artboard')
       settings.elements.push(this)
 
-      this.setSize(size)
+      this.setSize(_size)
       this.setPos(pos)
 
       this.artboard.addEventListener('click', e => {
         if (settings.stampImg) {
-          const { column, row } = settings.stampImg
+          const { column, row, scale } = settings.stampImg
           const { x, y } = settings.artboardWindow.pos
           new Block({
             ...settings.stampImg,
-            pos: { x: e.pageX - column / 2 - x, y: e.pageY - row / 2 - y - 20 },
+            pos: {
+              x: e.pageX - (column * scale) / 2 - x,
+              y: e.pageY - (row * scale) / 2 - y - 20,
+            },
           })
         }
       })
@@ -76,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   class Parameter extends PageObject {
-    constructor(pos) {
+    constructor(pos = { x: 300, y: 40 }) {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
@@ -90,12 +100,12 @@ window.addEventListener('DOMContentLoaded', () => {
       this.content = this.el.querySelector('.content')
       settings.elements.push(this)
       settings.parameterWindow = this
-      ;['x', 'y', 'z', 'ratio'].forEach(param => {
+      ;['default-scale', 'x', 'y', 'z', 'scale'].forEach(param => {
         const input = Object.assign(document.createElement('div'), {
           innerHTML:
             '<div class="input-wrapper">' +
             `<label>${param}</label>` +
-            `<input type="number" placeholder="${param}" data-type="${param}" />` +
+            `<input type="number" data-type="${param}" />` +
             '</div>',
         })
         this.content.appendChild(input)
@@ -104,12 +114,13 @@ window.addEventListener('DOMContentLoaded', () => {
           if (settings.focusElement) {
             settings.focusElement[param] = +e.target.value
             settings.focusElement.setPos()
+            settings.focusElement.setSize()
           }
         })
       })
-
-      this.setSize({ w: 200, h: 120 })
-      if (pos) this.setPos(pos)
+      this.setParam('default-scale', 1)
+      this.setSize({ w: 200, h: 'auto' })
+      this.setPos(pos)
     }
     setParam(param, value) {
       this[param] = value
@@ -118,7 +129,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('pointerdown', e => {
-    console.log(e.target.dataset.id)
     const el = settings.elements.find(
       element => element.id === e.target.dataset.id
     )
@@ -138,7 +148,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
   ;['pointerup', 'pointercancel'].forEach(action => {
-    window.addEventListener(action, () => {
+    window.addEventListener(action, e => {
       if (settings.activeElement instanceof Block) {
         settings.focusElement = settings.activeElement
         settings.parameterWindow.setParam('x', settings.activeElement.pos.x)
@@ -147,17 +157,29 @@ window.addEventListener('DOMContentLoaded', () => {
           'z',
           settings.blocks.indexOf(settings.activeElement)
         )
+        settings.parameterWindow.setParam('scale', settings.activeElement.scale)
       }
 
+      // update stamp
+      if (settings.stampImg)
+        settings.stampImg = {
+          ...settings.stampImg,
+          scale: settings.parameterWindow['default-scale'],
+        }
+
       settings.activeElement = null
-      localStorage.setItem(
-        SANDBOX_SAVE_DATA,
-        JSON.stringify({
+
+      if (!config.matches(':popover-open')) {
+        const data = {
           artboard: settings.artboardWindow,
           parameter: settings.parameterWindow,
           blocks: settings.blocks.sort((a, b) => a.z - b.z),
-        })
-      )
+        }
+        localStorage.setItem(SANDBOX_SAVE_DATA, JSON.stringify(data))
+        configTextarea.value = JSON.stringify(data, null, 2)
+        configTextarea.style.height =
+          (configTextarea.scrollHeight || 500) + 'px'
+      }
     })
   })
 
@@ -177,11 +199,11 @@ window.addEventListener('DOMContentLoaded', () => {
         })
       }
     } else {
-      stamp.style.transform = `translate(${e.pageX}px, ${e.pageY}px)`
+      stamp.style.transform = `translate(${e.pageX}px, ${e.pageY}px) scale(${settings.parameterWindow['default-scale']}) `
     }
   })
   class Block extends PageObject {
-    constructor({ dataUrl, column, row, name, id, pos, size }) {
+    constructor({ dataUrl, column, row, name, pos, _size: size, scale }) {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'block',
@@ -191,11 +213,10 @@ window.addEventListener('DOMContentLoaded', () => {
       settings.blocks.push(this)
       this.dataUrl = dataUrl
       this.name = name
-      this.id =
-        id || `${name}-${settings.blocks.filter(b => b.name === name).length}`
+      this.id = `${name}-${settings.blocks.filter(b => b.name === name).length}`
       this.el.dataset.id = this.id
       settings.artboardWindow.artboard.appendChild(this.el)
-
+      this.scale = scale || 1
       this.setSize(size || { w: column, h: row })
       if (pos) this.setPos(pos)
       this.z = settings.blocks.indexOf(this)
@@ -219,12 +240,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (savedData) {
     const data = JSON.parse(savedData)
-    new Window(data.artboard)
+    new Artboard(data.artboard)
     new Parameter(data.parameter.pos)
 
     data.blocks.forEach(b => new Block(b))
   } else {
-    new Window()
+    new Artboard()
     new Parameter()
   }
 
@@ -233,12 +254,17 @@ window.addEventListener('DOMContentLoaded', () => {
       className: 'box',
       innerHTML: `<img draggable="false" src="${d.dataUrl}" />`,
     })
-    menu.appendChild(box)
+    stampMenu.appendChild(box)
     box.dataset.size = `${d.column} x ${d.row}`
+
+    // stamping
     box.addEventListener('click', () => {
       stamp.innerHTML = `<img src="${d.dataUrl}" />`
-      settings.stampImg = d
-      menu.hidePopover()
+      settings.stampImg = {
+        ...d,
+        scale: settings.parameterWindow['default-scale'],
+      }
+      stampMenu.hidePopover()
     })
   })
 
@@ -263,10 +289,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.save').addEventListener('click', () => {
     const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
     const { w, h } = settings.artboardWindow.size
     canvas.setAttribute('width', w)
     canvas.setAttribute('height', h)
+    const ctx = canvas.getContext('2d')
+    ctx.imageSmoothingEnabled = false
     settings.blocks.forEach(b => {
       ctx.drawImage(
         b.el.querySelector('img'),
@@ -277,5 +304,31 @@ window.addEventListener('DOMContentLoaded', () => {
       )
     })
     downloadImage(canvas)
+  })
+
+  document.querySelector('.download').addEventListener('click', () => {
+    const url = window.URL.createObjectURL(
+      new Blob([configTextarea.value], {
+        type: 'text/plain',
+      })
+    )
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `sandbox_${new Date().getTime()}.txt`
+    link.click()
+  })
+
+  document.querySelector('.config-save').addEventListener('click', () => {
+    if (window.confirm('Are you sure you want to overwrite existing data?')) {
+      if (!configTextarea.value) {
+        localStorage.removeItem(SANDBOX_SAVE_DATA)
+      } else {
+        const data = JSON.parse(configTextarea.value)
+        const newData = JSON.stringify(data, null, 1)
+        localStorage.setItem(SANDBOX_SAVE_DATA, newData)
+      }
+
+      location.reload()
+    }
   })
 })
