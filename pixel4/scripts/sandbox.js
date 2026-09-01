@@ -81,6 +81,7 @@ window.addEventListener('DOMContentLoaded', () => {
               y: e.pageY - (row * scale) / 2 - y - 20,
             },
           })
+          saveConfig()
         }
       })
     }
@@ -148,6 +149,18 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
   })
+
+  const saveConfig = () => {
+    const data = {
+      artboard: settings.artboardWindow,
+      parameter: settings.parameterWindow,
+      blocks: settings.blocks.sort((a, b) => a.z - b.z),
+    }
+    localStorage.setItem(SANDBOX_SAVE_DATA, JSON.stringify(data))
+    configTextarea.value = JSON.stringify(data, null, 2)
+    configTextarea.style.height = (configTextarea.scrollHeight || 500) + 'px'
+  }
+
   ;['pointerup', 'pointercancel'].forEach(action => {
     window.addEventListener(action, () => {
       if (settings.activeElement instanceof Block) {
@@ -170,17 +183,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       settings.activeElement = null
 
-      if (!configMenu.matches(':popover-open')) {
-        const data = {
-          artboard: settings.artboardWindow,
-          parameter: settings.parameterWindow,
-          blocks: settings.blocks.sort((a, b) => a.z - b.z),
-        }
-        localStorage.setItem(SANDBOX_SAVE_DATA, JSON.stringify(data))
-        configTextarea.value = JSON.stringify(data, null, 2)
-        configTextarea.style.height =
-          (configTextarea.scrollHeight || 500) + 'px'
-      }
+      if (!configMenu.matches(':popover-open')) saveConfig()
     })
   })
 
@@ -258,7 +261,6 @@ window.addEventListener('DOMContentLoaded', () => {
     stampMenu.appendChild(box)
     box.dataset.size = `${d.column} x ${d.row}`
 
-    // stamping
     box.addEventListener('click', () => {
       stamp.innerHTML = `<img src="${d.dataUrl}" />`
       settings.stampImg = {
