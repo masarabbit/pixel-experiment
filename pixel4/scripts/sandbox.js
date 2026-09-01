@@ -4,6 +4,7 @@ const SANDBOX_SAVE_DATA = 'sandbox-save-data'
 
 window.addEventListener('DOMContentLoaded', () => {
   const stampMenu = document.getElementById('stamp-menu')
+  const configMenu = document.getElementById('config-menu')
   const stamp = document.querySelector('.stamp')
   const configTextarea = document.querySelector('textarea')
 
@@ -55,9 +56,9 @@ window.addEventListener('DOMContentLoaded', () => {
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
         innerHTML:
-          '<div class="window-handle" data-id="window" >artboard</div>' +
+          '<div class="window-handle" data-id="window">artboard</div>' +
           '<div class="artboard"></div>' +
-          '<div class="size-handle" data-id="window" ></div>',
+          '<div class="size-handle" data-id="window"></div>',
       })
       this.id = 'window'
 
@@ -91,7 +92,7 @@ window.addEventListener('DOMContentLoaded', () => {
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
         innerHTML:
-          '<div class="window-handle" data-id="parameter" >parameter</div>' +
+          '<div class="window-handle" data-id="parameter">parameter</div>' +
           '<div class="content"></div>',
       })
       this.id = 'parameter'
@@ -148,7 +149,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
   ;['pointerup', 'pointercancel'].forEach(action => {
-    window.addEventListener(action, e => {
+    window.addEventListener(action, () => {
       if (settings.activeElement instanceof Block) {
         settings.focusElement = settings.activeElement
         settings.parameterWindow.setParam('x', settings.activeElement.pos.x)
@@ -169,7 +170,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       settings.activeElement = null
 
-      if (!config.matches(':popover-open')) {
+      if (!configMenu.matches(':popover-open')) {
         const data = {
           artboard: settings.artboardWindow,
           parameter: settings.parameterWindow,
