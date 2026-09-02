@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   class ParameterMenu extends PageObject {
-    constructor(pos = { x: 300, y: 40 }, defaultScale, color = '#fff') {
+    constructor(pos = { x: 300, y: 40 }, defaultScale = 2, color = '#fff') {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
