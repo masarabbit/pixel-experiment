@@ -17,6 +17,17 @@ import { SAVE_DATA_NAME, getData } from '../../config.js'
 // TODO fix bugs present in the SVG convert (doesn't quite work when there are tranparent holes)
 
 window.addEventListener('DOMContentLoaded', () => {
+  const renderPalette = colors => {
+    elements.windows.palette.contentWrapper.innerHTML = `<div class="palette">
+                ${colors.reduce((acc, color) => {
+                  return (
+                    acc +
+                    `<div data-color="${color}" style="background-color: ${color};"></div>`
+                  )
+                }, '')}        
+                </div>`
+  }
+
   elements.windows = {
     colors: new NavWindow({
       name: 'colors',
@@ -195,16 +206,7 @@ window.addEventListener('DOMContentLoaded', () => {
           },
           {
             btnText: 'make palette',
-            action: nav => {
-              elements.windows.palette.contentWrapper.innerHTML = `<div class="palette">
-                ${getPalette(editor.colors).reduce((acc, color) => {
-                  return (
-                    acc +
-                    `<div data-color="${color}" style="background-color: ${color};"></div>`
-                  )
-                }, '')}
-              </div>`
-            },
+            action: () => renderPalette(getPalette(editor.colors)),
           },
           {
             className: 'trace-svg',
@@ -504,4 +506,20 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   editor.recordState()
+
+  //palette
+  // maybe set presets
+  renderPalette([
+    '#502407',
+    '#4cb4c2',
+    '#fbeca2',
+    '#cf8b54',
+    '#ec6a91',
+    '#9d744d',
+    '#4adde8',
+    '#ffffff',
+    '#f1e45b',
+    '#f7a6cd',
+    '#d3a382',
+  ])
 })
