@@ -1,6 +1,7 @@
 import { getData } from '../../config.js'
 
 const SANDBOX_SAVE_DATA = 'sandbox-save-data'
+const NAV_HEIGHT = 20
 
 window.addEventListener('DOMContentLoaded', () => {
   const stampMenu = document.getElementById('stamp-menu')
@@ -78,7 +79,7 @@ window.addEventListener('DOMContentLoaded', () => {
             ...settings.stampImg,
             pos: {
               x: e.pageX - (column * scale) / 2 - x,
-              y: e.pageY - (row * scale) / 2 - y - 20,
+              y: e.pageY - (row * scale) / 2 - y - NAV_HEIGHT,
             },
           })
           saveConfig()
@@ -333,7 +334,7 @@ window.addEventListener('DOMContentLoaded', () => {
         b.pos.x,
         b.pos.y,
         b.size.w,
-        b.size.h
+        b.size.h - NAV_HEIGHT
       )
     })
     downloadImage(canvas)
