@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   class ParameterMenu extends PageObject {
-    constructor(pos = { x: 300, y: 40 }, defaultScale) {
+    constructor(pos = { x: 300, y: 40 }, defaultScale, color = '#fff') {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
@@ -102,17 +102,28 @@ window.addEventListener('DOMContentLoaded', () => {
       this.content = this.el.querySelector('.content')
       settings.elements.push(this)
       settings.parameterWindow = this
-      ;['default-scale', 'x', 'y', 'z', 'scale'].forEach(param => {
+      this.colorInput = Object.assign(document.createElement('div'), {
+        className: 'input-wrapper',
+        innerHTML:
+          '<label>bg color</label><label class="color" for="color"></label><input id="color" type="color" data-type="color" />',
+      })
+      this.content.appendChild(this.colorInput)
+      this.colorInput.querySelector('input').addEventListener('change', e => {
+        this.updateColor(e.target.value)
+        saveConfig()
+      })
+      ;['hex', 'default-scale', 'x', 'y', 'z', 'scale'].forEach(param => {
         const input = Object.assign(document.createElement('div'), {
+          className: 'input-wrapper',
           innerHTML:
-            '<div class="input-wrapper">' +
-            `<label>${param}</label>` +
-            `<input type="number" data-type="${param}" />` +
-            '</div>',
+            `<label>${param.replace('-', ' ')}</label>` +
+            `<input type="${param === 'hex' ? 'text' : 'number'}" data-type="${param}" />`,
         })
         this.content.appendChild(input)
+
         input.querySelector('input').addEventListener('change', e => {
           this[param] = +e.target.value
+          if (param === 'hex') this.updateColor(e.target.value)
           if (settings.focusElement) {
             settings.focusElement[param] = +e.target.value
             settings.focusElement.setPos()
@@ -121,9 +132,16 @@ window.addEventListener('DOMContentLoaded', () => {
           saveConfig()
         })
       })
+      this.updateColor(color)
       this.setParam('default-scale', defaultScale)
       this.setSize({ w: 200, h: 'auto' })
       this.setPos(pos)
+    }
+    updateColor(color) {
+      this.color = color
+      this.colorInput.querySelector('.color').style.backgroundColor = color
+      settings.artboardWindow.artboard.style.backgroundColor = color
+      this.setParam('hex', color)
     }
     setParam(param, value) {
       this[param] = value
@@ -246,7 +264,11 @@ window.addEventListener('DOMContentLoaded', () => {
   if (savedData) {
     const data = JSON.parse(savedData)
     new Artboard(data.artboard)
-    new ParameterMenu(data.parameter.pos, data.parameter['default-scale'])
+    new ParameterMenu(
+      data.parameter.pos,
+      data.parameter['default-scale'],
+      data.parameter.color
+    )
 
     data.blocks.forEach(b => new Block(b))
   } else {
@@ -297,6 +319,8 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.setAttribute('width', w)
     canvas.setAttribute('height', h)
     const ctx = canvas.getContext('2d')
+    ctx.fillStyle = settings.parameterWindow.color
+    ctx.fillRect(0, 0, w, h)
     ctx.imageSmoothingEnabled = false
     settings.blocks.forEach(b => {
       ctx.drawImage(

@@ -213,3 +213,24 @@ textarea {
 .input-wrapper:has([data-type='default-scale']) {
   margin-bottom: 8px;
 }
+
+.input-wrapper:has([data-type='color']) {
+  display: flex;
+  align-items: center;
+}
+
+input[type='color'] {
+  display: none;
+}
+
+.color {
+  display: inline-block;
+  width: 40px;
+  height: 16px;
+  margin-left: 4px;
+  box-shadow: 0 0 0 1px var(--main);
+}
+
+input[data-type='hex'] {
+  width: 80px;
+}
