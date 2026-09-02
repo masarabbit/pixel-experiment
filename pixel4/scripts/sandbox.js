@@ -323,10 +323,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const canvas = document.createElement('canvas')
     const { w, h } = settings.artboardWindow.size
     canvas.setAttribute('width', w)
-    canvas.setAttribute('height', h)
+    canvas.setAttribute('height', h - NAV_HEIGHT)
     const ctx = canvas.getContext('2d')
     ctx.fillStyle = settings.parameterWindow.color
-    ctx.fillRect(0, 0, w, h)
+    ctx.fillRect(0, 0, w, h - NAV_HEIGHT)
     ctx.imageSmoothingEnabled = false
     settings.blocks.forEach(b => {
       ctx.drawImage(
@@ -334,7 +334,7 @@ window.addEventListener('DOMContentLoaded', () => {
         b.pos.x,
         b.pos.y,
         b.size.w,
-        b.size.h - NAV_HEIGHT
+        b.size.h
       )
     })
     downloadImage(canvas)
