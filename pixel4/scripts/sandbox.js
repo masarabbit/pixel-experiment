@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
         className: 'window',
         innerHTML:
           '<div class="window-handle" data-id="window">artboard</div>' +
-          '<div class="artboard"></div>' +
+          '<div class="artboard stampable"></div>' +
           '<div class="size-handle" data-id="window"></div>',
       })
       this.id = 'window'
@@ -207,6 +207,10 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   window.addEventListener('pointermove', e => {
+    stamp.classList[
+      e.target.classList.contains('stampable') ? 'remove' : 'add'
+    ]('d-none')
+
     e.target.setPointerCapture(e.pointerId)
     const el = settings.activeElement
     if (el && !settings.stampImg) {
@@ -229,7 +233,7 @@ window.addEventListener('DOMContentLoaded', () => {
     constructor({ dataUrl, column, row, name, pos, _size: size, scale }) {
       super()
       this.el = Object.assign(document.createElement('div'), {
-        className: 'block',
+        className: 'block stampable',
         innerHTML: `<img src="${dataUrl}" />`,
       })
       settings.elements.push(this)

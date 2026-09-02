@@ -197,7 +197,7 @@ label {
   border: 1px solid var(--main);
   margin-left: 4px;
   width: 40px;
-  padding: 0 4px;
+  padding-left: 4px;
 }
 
 textarea {
@@ -233,4 +233,8 @@ input[type='color'] {
 
 input[data-type='hex'] {
   width: 80px;
+}
+
+.d-none {
+  display: none;
 }
