@@ -137,13 +137,14 @@ window.addEventListener('DOMContentLoaded', () => {
       this.setSize({ w: 200, h: 'auto' })
       this.setPos(pos)
     }
-    updateColor(color) {
+    updateColor(color, updateHex = true) {
       this.color = color
       this.colorInput.querySelector('.color').style.backgroundColor = color
       settings.artboardWindow.artboard.style.backgroundColor = color
-      this.setParam('hex', color)
+      if (updateHex) this.setParam('hex', color)
     }
     setParam(param, value) {
+      if (param === 'hex') this.updateColor(value, false)
       this[param] = value
       this.content.querySelector(`[data-type=${param}]`).value = value
     }
