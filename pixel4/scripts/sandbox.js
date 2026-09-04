@@ -1,4 +1,4 @@
-import { getData } from '../../config.js'
+import { getLibraryData } from '../../config.js'
 
 const SANDBOX_SAVE_DATA = 'sandbox-save-data'
 const NAV_HEIGHT = 20
@@ -20,11 +20,11 @@ window.addEventListener('DOMContentLoaded', () => {
     parameterWindow: null,
     stampImg: null,
     deleteMode: false,
+    libraryData: [],
   }
   class PageObject {
     constructor() {
       this.pos = { x: 0, y: 0 }
-      this.grabSize = { w: 0, h: 0 }
       this.pointerPos = { x: 0, y: 0 }
       this._size = { w: 0, h: 0 }
       this.scale = 1
@@ -43,8 +43,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     get size() {
       return {
-        w: this._size.w * this.scale,
-        h: !isNaN(this._size.h) ? this._size.h * this.scale : 'auto',
+        w: nearestN(this._size.w) * this.scale,
+        h: !isNaN(this._size.h) ? nearestN(this._size.h) * this.scale : 'auto',
       }
     }
   }
@@ -54,6 +54,7 @@ window.addEventListener('DOMContentLoaded', () => {
       { _size, pos } = { _size: { w: 200, h: 100 }, pos: { x: 40, y: 40 } }
     ) {
       super()
+      this.grabSize = { w: 0, h: 0 }
       this.el = Object.assign(document.createElement('div'), {
         className: 'window',
         innerHTML:
@@ -173,9 +174,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const saveConfig = () => {
     const data = {
-      artboard: settings.artboardWindow,
-      parameter: settings.parameterWindow,
-      blocks: settings.blocks.sort((a, b) => a.z - b.z),
+      artboard: {
+        pos: settings.artboardWindow.pos,
+        _size: settings.artboardWindow._size,
+      },
+      parameter: {
+        pos: settings.parameterWindow.pos,
+        defaultScale: settings.parameterWindow['default-scale'],
+        color: settings.parameterWindow.color,
+      },
+      blocks: settings.blocks
+        .map(b => {
+          return {
+            name: b.name,
+            id: b.id,
+            pos: b.pos,
+            _z: b._z,
+            _size: b._size,
+            scale: b.scale,
+          }
+        })
+        .sort((a, b) => a.z - b.z),
     }
     localStorage.setItem(SANDBOX_SAVE_DATA, JSON.stringify(data))
     configTextarea.value = JSON.stringify(data, null, 2)
@@ -218,8 +237,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (el && !settings.stampImg) {
       if (e.target.classList.contains('size-handle')) {
         el.setSize({
-          w: el.grabSize.w + (e.pageX - el.pointerPos.x),
-          h: el.grabSize.h + (e.pageY - el.pointerPos.y),
+          w: nearestN(el.grabSize.w + (e.pageX - el.pointerPos.x)),
+          h: nearestN(el.grabSize.h + (e.pageY - el.pointerPos.y)),
         })
       } else {
         el.setPos({
@@ -240,7 +259,6 @@ window.addEventListener('DOMContentLoaded', () => {
       })
       settings.elements.push(this)
       settings.blocks.push(this)
-      this.dataUrl = dataUrl
       this.name = name
       this.id = `${name}-${settings.blocks.filter(b => b.name === name).length}`
       this.el.dataset.id = this.id
@@ -265,24 +283,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const savedData = localStorage.getItem(SANDBOX_SAVE_DATA)
-
-  if (savedData) {
-    const data = JSON.parse(savedData)
-    new Artboard(data.artboard)
-    new ParameterMenu(
-      data.parameter.pos,
-      data.parameter['default-scale'],
-      data.parameter.color
-    )
-
-    data.blocks.forEach(b => new Block(b))
-  } else {
-    new Artboard()
-    new ParameterMenu()
-  }
-
-  getData().forEach(d => {
+  settings.libraryData = getLibraryData()
+  settings.libraryData.forEach(d => {
     const box = Object.assign(document.createElement('div'), {
       className: 'box',
       innerHTML: `<img draggable="false" src="${d.dataUrl}" />`,
@@ -299,6 +301,31 @@ window.addEventListener('DOMContentLoaded', () => {
       stampMenu.hidePopover()
     })
   })
+
+  const savedData = localStorage.getItem(SANDBOX_SAVE_DATA)
+
+  if (savedData) {
+    const data = JSON.parse(savedData)
+    new Artboard(data.artboard)
+    new ParameterMenu(
+      data.parameter.pos,
+      data.parameter['default-scale'],
+      data.parameter.color
+    )
+    data.blocks.forEach(b => {
+      const blockData = settings.libraryData.find(d => d.name === b.name)
+      if (blockData)
+        new Block({
+          ...b,
+          dataUrl: blockData.dataUrl,
+          column: blockData.column,
+          row: blockData.column,
+        })
+    })
+  } else {
+    new Artboard()
+    new ParameterMenu()
+  }
 
   document.querySelector('.clear-stamp').addEventListener('click', () => {
     stamp.innerHTML = ''

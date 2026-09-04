@@ -73,7 +73,7 @@ export const sample = [
   },
 ]
 
-export const getData = () => {
+export const getLibraryData = () => {
   const savedData = localStorage.getItem(SAVE_DATA_NAME)
   const parsedData = savedData ? JSON.parse(savedData) : []
 

@@ -1,9 +1,9 @@
-import { getData } from '../../config.js'
+import { getLibraryData } from '../../config.js'
 
 window.addEventListener('DOMContentLoaded', () => {
   const wrapper = document.querySelector('.wrapper')
 
-  getData().forEach(config => {
+  getLibraryData().forEach(config => {
     const box = Object.assign(document.createElement('div'), {
       className: 'box',
       innerHTML: `<img draggable="false" src="${config.dataUrl}" />`,

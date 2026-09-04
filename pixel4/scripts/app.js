@@ -9,7 +9,7 @@ import { NavWindow } from './classes/nav.js'
 import TraceSvg from './classes/traceSvg.js'
 import { editor, elements } from './elements.js'
 import { getPalette } from './utils.js'
-import { SAVE_DATA_NAME, getData } from '../../config.js'
+import { SAVE_DATA_NAME, getLibraryData } from '../../config.js'
 
 // TODO add cursor for highlighting hover area (and possibly showing alt)
 // TODO some bugs relating to having multiple artboards (maybe need to have separate places to store colors and data url, since these can get mixed up)
@@ -494,7 +494,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const imgName = param.get('img')
 
   if (imgName) {
-    const data = getData().find(c => c.name === imgName)
+    const data = getLibraryData().find(c => c.name === imgName)
     if (data) {
       ;['dataUrl', 'column', 'row'].forEach(
         param => (editor.inputs[param].value = data[param])
