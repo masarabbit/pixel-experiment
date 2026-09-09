@@ -384,10 +384,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     dataUrl,
                     column,
                     row,
-                    name:
-                      filename +
-                      '_' +
-                      parsedData.filter(d => d.name === filename)?.length,
+                    name: filename,
                   },
                 ])
               )
