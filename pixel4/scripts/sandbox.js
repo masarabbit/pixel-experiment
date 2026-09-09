@@ -251,7 +251,16 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
   class Block extends PageObject {
-    constructor({ dataUrl, column, row, name, pos, _size: size, scale }) {
+    constructor({
+      dataUrl,
+      column,
+      row,
+      name,
+      pos,
+      _size: size,
+      scale,
+      _z: z,
+    }) {
       super()
       this.el = Object.assign(document.createElement('div'), {
         className: 'block stampable',
@@ -266,7 +275,7 @@ window.addEventListener('DOMContentLoaded', () => {
       this.scale = scale || 1
       this.setSize(size || { w: column, h: row })
       if (pos) this.setPos(pos)
-      this.z = settings.blocks.indexOf(this)
+      this.z = !isNaN(z) ? z : settings.blocks.indexOf(this)
     }
     set x(value) {
       this.pos.x = value
