@@ -380,7 +380,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 SAVE_DATA_NAME,
                 JSON.stringify([
                   ...parsedData,
-                  { dataUrl, column, row, name: filename },
+                  {
+                    dataUrl,
+                    column,
+                    row,
+                    name:
+                      filename +
+                      '_' +
+                      parsedData.filter(d => d.name === filename)?.length,
+                  },
                 ])
               )
             },
