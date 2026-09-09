@@ -364,15 +364,17 @@ window.addEventListener('DOMContentLoaded', () => {
     ctx.fillStyle = settings.parameterWindow.color
     ctx.fillRect(0, 0, w, h - NAV_HEIGHT)
     ctx.imageSmoothingEnabled = false
-    settings.blocks.forEach(b => {
-      ctx.drawImage(
-        b.el.querySelector('img'),
-        b.pos.x,
-        b.pos.y,
-        b.size.w,
-        b.size.h
-      )
-    })
+    settings.blocks
+      .sort((a, b) => a.z - b.z)
+      .forEach(b => {
+        ctx.drawImage(
+          b.el.querySelector('img'),
+          b.pos.x,
+          b.pos.y,
+          b.size.w,
+          b.size.h
+        )
+      })
     downloadImage(canvas)
   })
 
