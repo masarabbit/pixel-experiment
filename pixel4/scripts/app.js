@@ -337,7 +337,7 @@ window.addEventListener('DOMContentLoaded', () => {
           },
           {
             className: 'color-picker',
-            shortCut: 'p',
+            shortCut: 'q',
             action: b => {
               b.classList.toggle('active')
               editor.colorPick = !editor.colorPick
