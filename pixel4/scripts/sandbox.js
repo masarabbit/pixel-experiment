@@ -43,8 +43,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     get size() {
       return {
-        w: nearestN(this._size.w) * this.scale,
-        h: !isNaN(this._size.h) ? nearestN(this._size.h) * this.scale : 'auto',
+        w: this._size.w * this.scale,
+        h: !isNaN(this._size.h) ? this._size.h * this.scale : 'auto',
       }
     }
   }
