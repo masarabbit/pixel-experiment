@@ -3,7 +3,6 @@ export const nearestN = (x, n) =>
 export const isNum = x => typeof x === 'number'
 export const px = n => (!isNaN(n) ? `${Math.round(n)}px` : '')
 
-// const n = Math.round(255 / 3)
 const n = 1
 export const rgbToHex = (r, g, b) => {
   if (r > 255 || g > 255 || b > 255) throw 'Invalid color component'
@@ -12,6 +11,10 @@ export const rgbToHex = (r, g, b) => {
     (nearestN(g, n) << 8) |
     nearestN(b, n)
   ).toString(16)
+
+  // This overrides the image to be black and white
+  // const avg = (r + g + b) / 3
+  // return avg > 150 ? 'ffffff' : '000000'
 }
 
 export const hex = rgb => '#' + ('000000' + rgb).slice(-6)
